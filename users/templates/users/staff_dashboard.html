@@ -1,0 +1,37 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+
+  {% block content %}
+
+    {% include 'lms/includes/top_menu.html' %}
+      <!-- ============================================================== -->
+    <div class="main-content indpages">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="page-title-box">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            {% if request.user.user_type == 'MODERATOR' %}
+                                <h6 class="page-title">Moderator DASHBOARD</h6>
+                            {% else %}
+                                <h6 class="page-title">ADMIN DASHBOARD</h6>
+                            {% endif %}
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item active">Welcome to GCNEP STAFF Dashboard</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+    </div>
+    <!-- end main content-->
+
+  {% endblock %}

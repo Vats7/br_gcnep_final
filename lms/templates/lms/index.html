@@ -1,0 +1,12 @@
+
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block content %}
+<div id="layout-wrapper">
+    {% include 'lms/includes/top_menu.html' %}
+    {% include 'lms/includes/sidebar.html' %}
+    {% include 'lms/includes/dashboard.html' %}
+</div>
+<div class="rightbar-overlay"></div>
+{% endblock %}

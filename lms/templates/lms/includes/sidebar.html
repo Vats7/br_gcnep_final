@@ -1,0 +1,124 @@
+{% load static %}
+
+
+<!-- ========== Left Sidebar Start ========== -->
+<div class="vertical-menu">
+
+    <div data-simplebar class="h-100">
+
+        <!--- Sidemenu -->
+        <div id="sidebar-menu">
+            <!-- Left Menu Start -->
+            <ul class="metismenu list-unstyled" id="side-menu">
+                {% if not request.user.is_staff %}
+                    <!--dash-->
+                    <li>
+                        <a href="index.html" class="waves-effect">
+                            <i class="ti-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!--Training-->
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ti-book"></i>
+                            <span>Training Management</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'lms:all_trainings' %}">Access Training/Event list </a></li>
+                            {#<li><a href="#">Create a new event </a></li>#}
+                        </ul>
+                    </li>
+                    <!--course-->
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ti-book"></i>
+                            <span>Course Management</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="#">My Courses</a></li>
+                        </ul>
+                    </li>
+                    <!--setting-->
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="mdi mdi-cog font-size-17 align-middle me-1"></i>
+                            <span>Setting</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="change-password.html">Change password</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="index.html" class="waves-effect">
+                            <i class="ti-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ti-book"></i>
+                            <span>Training Management</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'lms:all_trainings' %}">Access Training/Event list </a></li>
+                            <li><a href="#">Create a new event </a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ti-book"></i>
+                            <span>Course Management</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'home:all_courses' %}">Access all Courses</a></li>
+{#                            <li><a href="#">Create a new course </a></li>#}
+                        </ul>
+                    </li>
+                    <!--Roles-->
+                    <li>
+                        <a href="roles-rights-management.html" class="waves-effect">
+                            <i class="ti-infinite"></i>
+                            <span>Roles & Rights Management</span>
+                        </a>
+                    </li>
+                    <!--Backup-->
+                    <li>
+                        <a href="#" class="waves-effect">
+                            <i class="ti-book"></i>
+                            <span>Backup & Data Management </span>
+                        </a>
+                    </li>
+                    <!--report-->
+                    <li>
+                        <a href="#" class="waves-effect">
+                            <i class="ti-receipt"></i>
+                            <span>Report management </span>
+                        </a>
+                    </li>
+                    <!--Study content-->
+                    <li>
+                        <a href="#" class="waves-effect">
+                            <i class="ti-bar-chart-alt"></i>
+                            <span>Study Content Management</span>
+                        </a>
+                    </li>
+                    <!--setting-->
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="mdi mdi-cog font-size-17 align-middle me-1"></i>
+                            <span>Setting</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="change-password.html">Change password</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->

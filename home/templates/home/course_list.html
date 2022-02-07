@@ -1,0 +1,408 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+    <div id="layout-wrapper">
+        {% include 'lms/includes/top_menu.html' %}
+        {% include 'lms/includes/sidebar.html' %}
+        {% if courses %}
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid">
+                        <div class="page-title-box">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="page-title">All Courses </h6>
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="#">GCNEP</a></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Search by</h4>
+{#                                        <form class="repeater" enctype="multipart/form-data">#}
+                                        <form id="search-form" class="repeater">
+                                            <div data-repeater-list="group-a">
+                                                <div data-repeater-item class="row">
+                                                    <div class="mb-3 col-lg-3">
+                                                        <label class="form-label" for="query">Search...</label>
+                                                        <input type="text" id="query" name="untyped-input"
+                                                               class="form-control"/>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-sm-4 align-self-center">
+                                                        <div class="d-grid">
+                                                            <label for="subject">&nbsp;</label>
+                                                            <input type="button" class="btn btn-primary mb-2"
+                                                                   value="Submit"/>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end search -->
+                        <div id="search-results">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card ">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table text-center mb-20">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>School Name</th>
+                                                                <th>Course Name</th>
+                                                                <th>Syllabus</th>
+                                                                <th>XYZ</th>
+                                                                <th>JOIN</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for c in courses %}
+                                                                <tr>
+                                                                    <th scope="row"><a href="{% url 'home:course_detail' c.unique_id %}">{{ c.unique_id }}</a></th>
+                                                                    <td>{{ c.school }}</td>
+                                                                    <td>{{ c.title }}</td>
+                                                                    <td>x</td>
+                                                                    <td>x</td>
+                                                                    <!-- Iframe settings-->
+                                                                    {#<iframe src="{% url 'lms:join_meeting' t.unique_id %}"></iframe>#}
+                                                                    <td>
+{#                                                                        <a href="{% url 'lms:redirect_meeting' t.unique_id %}">#}
+{#                                                                            <button class="primary">Join</button>#}
+{#                                                                        </a>#}
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="btn btn-primary btn-sm edit" title="View"
+                                                                           data-bs-toggle="modal"
+                                                                           data-bs-target="#viewModal"> <i
+                                                                                class="fas fa-eye"></i></a>
+                                                                        {% if request.user.is_staff %}
+                                                                            <a class="btn btn-success btn-sm edit"
+                                                                               title="Edit"> <i
+                                                                                    class="fas fa-pencil-alt"></i></a>
+                                                                            <a class="btn btn-danger btn-sm edit"
+                                                                               title="Delete"><i
+                                                                                    class="fas fa-trash"></i></a>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                {% if is_paginated %}
+                                                    <div class="col-sm-12 col-md-7">
+                                                        <div class="pagination">
+                                                        <span class="step-links">
+                                                            {% if page_obj.has_previous %}
+                                                                <a href="?page=1">&laquo; first</a>
+                                                                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                                                            {% endif %}
+
+                                                            <span class="current">
+                                                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                                                            </span>
+
+                                                            {% if page_obj.has_next %}
+                                                                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                                                                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                                                            {% endif %}
+                                                        </span>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                ©
+                                <script>document.write(new Date().getFullYear())</script>
+                                GCNEP</span>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        {% else %}
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid">
+                        <h1>No Courses Available</h1>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="right-bar">
+        <div data-simplebar class="h-100">
+            <div class="rightbar-title px-3 py-4">
+                <a href="javascript:void(0);" class="right-bar-toggle float-end">
+                    <i class="mdi mdi-close noti-icon"></i>
+                </a>
+                <h5 class="m-0">Settings</h5>
+            </div>
+
+            <!-- Settings -->
+            <hr class="mt-0"/>
+            <h6 class="text-center">Choose Layouts</h6>
+
+            <div class="p-4">
+                <div class="mb-2">
+                    <img src="{% static 'images/layouts/layout-1.jpg' %}" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input type="checkbox" class="form-check-input theme-choice" id="light-mode-switch" checked/>
+                    <label class="form-check-label" for="light-mode-switch">Light Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="{% static 'images/layouts/layout-2.jpg' %}" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input type="checkbox" class="form-check-input theme-choice" id="dark-mode-switch"
+                           data-bsStyle="assets/css/bootstrap-dark.min.css"
+                           data-appStyle="assets/css/app-dark.min.css"/>
+                    <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="{% static 'images/layouts/layout-3.jpg' %}" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="form-check form-switch mb-5">
+                    <input type="checkbox" class="form-check-input theme-choice" id="rtl-mode-switch"
+                           data-appStyle="assets/css/app-rtl.min.css"/>
+                    <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>
+                </div>
+                <div class="d-grid">
+                    <a href="https://1.envato.market/grNDB" class="btn btn-primary mt-3" target="_blank"><i
+                            class="mdi mdi-cart me-1"></i> Purchase Now</a>
+                </div>
+            </div>
+
+        </div> <!-- end slimscroll-menu-->
+    </div>
+    <div class="rightbar-overlay"></div>
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Event List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <form class="outer-repeater">
+
+                                <div class="row">
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Program/Event Name :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Event type :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Event type- Others :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Organizing School :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Other organizing unit/school :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Foreign Organization :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Master image (Flyer) :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Event Description :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Event Duration :</label>
+
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Registration Due Date :</label>
+                                        <input type="date" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Program Agenda :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <h4>Program Coordinator Details</h4>
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Name :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Designation :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Unit :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Email-id :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Contact Number :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <h4>Course Director details </h4>
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Name :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Designation :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Unit :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Email-id :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Contact Number :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <h4>Email content</h4>
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Program Name :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Duration :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Attachments - Agenda :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Master Image :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Registration Link :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Username :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label">Pass Code :</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
