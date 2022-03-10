@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.utils.html import format_html
 from django.utils.translation import ngettext
 
-from lms.admin import EnrollmentInline
+# from lms.admin import EnrollmentInline
 from .forms import UserAdminCreationForm, UserChangeForm
 from .models import CustomUser, UserProfile, ModeratorProfile, UserType, Document, Education, Employment
 
@@ -34,20 +34,12 @@ class EducationInlineAdmin(admin.StackedInline):
     readonly_fields = ('unique_id', 'created_by', 'created_at', 'updated_at')
     classes = ['collapse']
 
-    def has_add_permission(self, request, obj):
-        if len(self.model.objects.all()) == 1:
-            return False
-
 
 class EmploymentInlineAdmin(admin.StackedInline):
     model = Employment
     extra = 0
     readonly_fields = ('unique_id', 'created_by', 'created_at', 'updated_at')
     classes = ['collapse']
-
-    def has_add_permission(self, request, obj):
-        if len(self.model.objects.all()) == 1:
-            return False
 
 
 @admin.register(CustomUser)
@@ -136,6 +128,7 @@ class ModeratorProfileAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
+    list_filter = ('user__types',)
     search_fields = ['user__name']
     readonly_fields = ('image_tag', )
     list_display = ('user', 'get_name',)
@@ -157,7 +150,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             'fields': (('ofc_add', 'ofc_number',), ('nationality', 'fax', 'secondary_email')),
          }),
     )
-    inlines = [DocumentInlineAdmin, EducationInlineAdmin, EmploymentInlineAdmin, EnrollmentInline]
+    inlines = [DocumentInlineAdmin, EducationInlineAdmin, EmploymentInlineAdmin]#EnrollmentInline
 
     @admin.display(description='Name')
     def get_name(self, obj):

@@ -18,12 +18,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('lms.urls')),
     path('', include('users.urls')),
     path('', include('home.urls')),
+    path('', include('cms.urls')),
+    path("select2/", include("django_select2.urls")),
+    path('jsi18n', JavaScriptCatalog.as_view(), name='js-catalog'),
     path('password_reset/done/',
          auth_views.PasswordResetDoneView.as_view(template_name='users/password_reset_done.html'),
          name='password_reset_done'),

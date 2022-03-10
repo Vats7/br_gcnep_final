@@ -14,6 +14,9 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
 
+    {% block head %}
+    {% endblock %}
+
     <link href="{% static 'libs/chartist/chartist.min.css' %}" rel="stylesheet">
 
     <!-- Bootstrap Css -->
@@ -22,18 +25,18 @@
     <link href="{% static 'css/icons.min.css' %}" rel="stylesheet" type="text/css">
     <!-- App Css-->
     <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css">
-
 </head>
 
 <body data-sidebar="dark">
-
-{% include 'lms/includes/messages.html' %}
 
     {% block content %}
     {% endblock %}
 
 
 
+
+    {% block scripts %}
+    {% endblock %}
 <!-- JAVASCRIPT -->
 <script src="{% static 'libs/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -51,7 +54,8 @@
 
 <script src="{% static 'js/pages/dashboard.init.js' %}"></script>
 
-<script src="{% static 'js/app.js' %}" defer></script>
+<script src="{% static 'js/app.js' %}" ></script>
+
 </body>
 
 

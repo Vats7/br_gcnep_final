@@ -1,0 +1,61 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'lms/includes/top_menu.html' %}
+    {% include 'lms/includes/sidebar.html' %}
+    <div class="main-content indpages">
+        <div class="page-content">
+            <div class="container-fluid">
+                <div class="page-title-box">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="page-title">Training Detail</h6>
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item active">This is <b>{{ training.title }}</b></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                {% include 'lms/includes/attendee_list.html' %}
+            </div>
+        </div>
+        <div class="modal fade" id="deleteAttendeeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Remove Attendee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            Are you sure you want to remove this user from the training?
+                            <a href="">
+                                <button class="btn btn-danger">Remove</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        © <script>document.write(new Date().getFullYear())</script> GCNEP
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+{% endblock %}
+
+
+
+
+

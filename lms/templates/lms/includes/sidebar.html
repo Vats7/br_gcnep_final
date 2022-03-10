@@ -25,7 +25,7 @@
                             <span>Training Management</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="{% url 'lms:all_trainings' %}">Access Training/Event list </a></li>
+                            <li><a href="{% url 'lms:my_trainings' %}">My Trainings</a></li>
                             {#<li><a href="#">Create a new event </a></li>#}
                         </ul>
                     </li>
@@ -59,11 +59,23 @@
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="ti-book"></i>
+                            <span>User Management</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'users:user_list' %}">Access Users list </a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ti-book"></i>
                             <span>Training Management</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="{% url 'lms:all_trainings' %}">Access Training/Event list </a></li>
-                            <li><a href="#">Create a new event </a></li>
+                            {% if request.user.is_superuser %}
+                                <li><a href="{% url 'lms:all_trainings' %}">Access Training/Event list </a></li>
+                            {% endif %}
+                            <li><a href="{% url 'lms:my_trainings' %}">My Trainings</a></li>
+                            <li><a href="{% url 'lms:create_training' %}">Create Training</a></li>
                         </ul>
                     </li>
                     <li>
@@ -73,7 +85,7 @@
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
                             <li><a href="{% url 'home:all_courses' %}">Access all Courses</a></li>
-{#                            <li><a href="#">Create a new course </a></li>#}
+                            <li><a href="{% url 'home:create_course' %}">Create</a></li>
                         </ul>
                     </li>
                     <!--Roles-->

@@ -10,3 +10,14 @@ def create_user_unique(sender, instance, created, **kwargs):
         u_id = uuid.uuid4().hex[:13].upper()
         instance.user_unique_id = u_id
         instance.save()
+
+
+@receiver(post_save, sender=Training)
+def admin_mod_enroll(sender, instance, created, **kwargs):
+    if created:
+        Enrollment.objects.create(
+            training=instance,
+            user=instance.created_by,
+            permission='ADMIN',
+            created_by_id=instance.created_by.id
+        )

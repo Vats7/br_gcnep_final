@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
+
 from home.models import BaseModel, School, Course
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -39,7 +41,12 @@ class Training(BaseModel):
         blank=True,
         help_text='Only required if Training Type is "OTHER"'
     )
-    attendees = models.ManyToManyField(UserProfile, through='Enrollment')
+    attendees = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through='Enrollment',
+        #related_name='all_attendees',
+        through_fields=('training', 'user'),
+    )
     main_image = models.ImageField(
         upload_to='trainings/main_image/',
         verbose_name='Image',
@@ -54,6 +61,7 @@ class Training(BaseModel):
     start_at = models.DateTimeField(blank=True, null=True)###change
     end_at = models.DateTimeField(blank=True, null=True)####change
     #is_active = models.BooleanField(default=False)
+    chime_id = models.CharField(max_length=200, blank=True)
 
     class Meta:
         verbose_name = ' Training'
@@ -70,26 +78,45 @@ class Training(BaseModel):
         return reverse('lms:training_detail', kwargs={'pk': self.pk})
 
     @property
+    def total_attendees(self):
+        return self.attendees.all().count()
+
+    @property
     def duration(self):
-        return self.end_at - self.start_at
+        if self.start_at and self.end_at is not None:
+            return self.end_at - self.start_at
+        return f"Time not set"
+
+    @property
+    def is_started(self):
+        # now = timezone.now()
+        now = timezone.localtime(timezone.now())
+        print(now)
+        ##remove this if
+        if self.start_at is None:
+            return True
+        if now >= self.start_at:
+            return True
+        return False
 
     def clean(self):
         if self.start_at and self.end_at:
             if self.start_at >= self.end_at:
-                raise ValidationError('Time error')
+                raise ValidationError('Start Time Can Not be more than or equal to end Time')
         if self.training_type == 'OTHER':
             if not self.other:
-                raise ValidationError('OTHER training_type error')
+                raise ValidationError({'other': 'This field is required if Training Type is OTHER'})
 
 
 class Enrollment(BaseModel):
     class Type(models.TextChoices):
+        ADMIN = 'ADMIN', _('Admin')
         PRIMARY = 'PRIMARY', _('Primary Trainer')
         OTHER = 'OTHER', _('Other Trainer')
         TRAINEE = 'TRAINEE', _('Trainee')
         OBSERVER = 'OBSERVER', _('Observer')
 
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='enrolled')
     user_unique_id = models.CharField(unique=True, max_length=15)#uuid.uuid4().hex[:13].upper()
     training = models.ForeignKey(Training, on_delete=models.CASCADE)
     permission = models.CharField(max_length=15, choices=Type.choices)
@@ -98,6 +125,8 @@ class Enrollment(BaseModel):
     start_at = models.DateTimeField(blank=True, null=True)
     end_at = models.DateTimeField(blank=True, null=True)
     joined_at = models.DateTimeField(blank=True, null=True)
+    attendee_id = models.CharField(max_length=200, blank=True)
+    join_token = models.CharField(max_length=200, blank=True)
 
     class Meta:
         unique_together = [['user', 'training']]
@@ -106,24 +135,26 @@ class Enrollment(BaseModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"user----{self.user.user.name} training---{self.training.title}"
+        #return f"user----{self.user.user.name} training---{self.training.title}"
+        return f"{self.user.email} is enrolled in {self.training.title}"
 
     def clean(self):
         trainer = UserType.objects.get(type='TRAINER')
         trainee = UserType.objects.get(type='TRAINEE')
         observer = UserType.objects.get(type='OBSERVER')
         print(self.permission)
-        print(self.user.user.types.all())
-        if trainer not in self.user.user.types.all():
+        print(self.user.types.all())
+        types = self.user.types.all()
+        if trainer not in types:
             if self.permission in ['PRIMARY', 'OTHER']:
-                raise ValidationError('Incorrect User Type')
+                raise ValidationError('Selected User does not have required permission')
 
-        if trainee not in self.user.user.types.all():
+        if trainee not in types:
             if self.permission == 'TRAINEE':
-                raise ValidationError('Incorrect User Type')
+                raise ValidationError('Selected User does not have required permission')
 
-        if observer not in self.user.user.types.all():
+        if observer not in types:
             if self.permission == 'OBSERVER':
-                raise ValidationError('Incorrect User Type')
+                raise ValidationError('Selected User does not have required permission')
 
 

@@ -7,7 +7,6 @@
     <div id="layout-wrapper">
         {% include 'lms/includes/top_menu.html' %}
         {% include 'lms/includes/sidebar.html' %}
-        {% if courses %}
             <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
@@ -27,7 +26,6 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h4 class="card-title">Search by</h4>
-{#                                        <form class="repeater" enctype="multipart/form-data">#}
                                         <form id="search-form" class="repeater">
                                             <div data-repeater-list="group-a">
                                                 <div data-repeater-item class="row">
@@ -36,17 +34,7 @@
                                                         <input type="text" id="query" name="untyped-input"
                                                                class="form-control"/>
                                                     </div>
-
-                                                    <div class="col-lg-2 col-sm-4 align-self-center">
-                                                        <div class="d-grid">
-                                                            <label for="subject">&nbsp;</label>
-                                                            <input type="button" class="btn btn-primary mb-2"
-                                                                   value="Submit"/>
-                                                        </div>
-                                                    </div>
-
                                                 </div>
-
                                             </div>
                                         </form>
                                     </div>
@@ -55,92 +43,10 @@
                         </div>
                         <!-- end search -->
                         <div id="search-results">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="card ">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <div class="table-responsive">
-                                                        <table class="table text-center mb-20">
-                                                            <thead>
-                                                            <tr>
-                                                                <th>#</th>
-                                                                <th>School Name</th>
-                                                                <th>Course Name</th>
-                                                                <th>Syllabus</th>
-                                                                <th>XYZ</th>
-                                                                <th>JOIN</th>
-                                                                <th>Actions</th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            {% for c in courses %}
-                                                                <tr>
-                                                                    <th scope="row"><a href="{% url 'home:course_detail' c.unique_id %}">{{ c.unique_id }}</a></th>
-                                                                    <td>{{ c.school }}</td>
-                                                                    <td>{{ c.title }}</td>
-                                                                    <td>x</td>
-                                                                    <td>x</td>
-                                                                    <!-- Iframe settings-->
-                                                                    {#<iframe src="{% url 'lms:join_meeting' t.unique_id %}"></iframe>#}
-                                                                    <td>
-{#                                                                        <a href="{% url 'lms:redirect_meeting' t.unique_id %}">#}
-{#                                                                            <button class="primary">Join</button>#}
-{#                                                                        </a>#}
-                                                                    </td>
-                                                                    <td>
-                                                                        <a class="btn btn-primary btn-sm edit" title="View"
-                                                                           data-bs-toggle="modal"
-                                                                           data-bs-target="#viewModal"> <i
-                                                                                class="fas fa-eye"></i></a>
-                                                                        {% if request.user.is_staff %}
-                                                                            <a class="btn btn-success btn-sm edit"
-                                                                               title="Edit"> <i
-                                                                                    class="fas fa-pencil-alt"></i></a>
-                                                                            <a class="btn btn-danger btn-sm edit"
-                                                                               title="Delete"><i
-                                                                                    class="fas fa-trash"></i></a>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                </tr>
-                                                            {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                {% if is_paginated %}
-                                                    <div class="col-sm-12 col-md-7">
-                                                        <div class="pagination">
-                                                        <span class="step-links">
-                                                            {% if page_obj.has_previous %}
-                                                                <a href="?page=1">&laquo; first</a>
-                                                                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-                                                            {% endif %}
-
-                                                            <span class="current">
-                                                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                                                            </span>
-
-                                                            {% if page_obj.has_next %}
-                                                                <a href="?page={{ page_obj.next_page_number }}">next</a>
-                                                                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-                                                            {% endif %}
-                                                        </span>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {% include 'home/includes/course_list.html' %}
                         </div>
-                    </div> <!-- container-fluid -->
+                    </div>
                 </div>
-                <!-- End Page-content -->
                 <footer class="footer">
                     <div class="container-fluid">
                         <div class="row">
@@ -153,15 +59,6 @@
                     </div>
                 </footer>
             </div>
-        {% else %}
-            <div class="main-content">
-                <div class="page-content">
-                    <div class="container-fluid">
-                        <h1>No Courses Available</h1>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
     </div>
     <div class="right-bar">
         <div data-simplebar class="h-100">

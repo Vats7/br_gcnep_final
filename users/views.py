@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
@@ -116,20 +116,38 @@ def profile_view(request):
 @method_decorator(staff_member_required, name='dispatch')
 class UserList(ListView):
     model = User
-    template_name = 'users/user_list.html'
+    template_name = 'users/all_users.html'
     context_object_name = 'users'
     paginate_by = 5
     permission_classes = []
 
     def get_queryset(self):
         queryset = User.objects.all()
-        staff = self.request.user.is_staff
-        admin = self.request.user.is_superuser
-        if admin:
+        if self.request.user.is_superuser:
             return queryset
-        if staff and not admin:
+        else:
             return queryset.filter(is_staff=False)
 
 
+def user_search(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-
+    if is_ajax:
+        if request.method == 'GET':
+            url_parameter = request.GET.get("q")
+            if request.user.is_superuser:
+                users = User.objects.filter(name__icontains=url_parameter, email__icontains=url_parameter)
+                html = render_to_string(
+                    template_name="users/includes/user_list.html",
+                    context={"users": users}
+                )
+                data_dict = {"html_from_view": html}
+                return JsonResponse(data=data_dict, safe=False)
+            else:
+                users = User.objects.filter(name__icontains=url_parameter, email__icontains=url_parameter, is_staff=False)
+                html = render_to_string(
+                    template_name="users/includes/user_list.html",
+                    context={"users": users}
+                )
+                data_dict = {"html_from_view": html}
+                return JsonResponse(data=data_dict, safe=False)

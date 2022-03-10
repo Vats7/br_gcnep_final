@@ -38,9 +38,10 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_extensions',
     'corsheaders',
+    'django_select2',
 
 ]
-
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
@@ -116,7 +117,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -139,6 +140,8 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
+    BASE_DIR / 'lms' / 'static',
+    BASE_DIR / 'users' / 'static',
 ]
 
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -157,8 +160,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #  }
 
 
+
+
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = 'home'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
+AWS_KEY_ID = config('AWS_KEY_ID')
+AWS_SECRET_KEY = config('AWS_SECRET_KEY')
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "example"
+    },
+    "select2": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# Tell select2 which cache configuration to use:
+SELECT2_CACHE_BACKEND = "select2"

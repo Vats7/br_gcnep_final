@@ -8,4 +8,5 @@ app_name = 'home'
 urlpatterns = [
     path('courses/all', views.AllCourses.as_view(), name='all_courses'),
     path('courses/<str:pk>', views.CourseDetail.as_view(), name='course_detail'),
+    path('course/create/', views.create_course, name='create_course')
 ]

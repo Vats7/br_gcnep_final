@@ -40,7 +40,6 @@ class UserChangeForm(forms.ModelForm):
         fields = ('email', 'password', 'name', 'is_active', 'is_staff', 'is_superuser', 'types')
 
 
-
 class LoginForm(forms.Form):
     """user login form"""
     email = forms.EmailField()
@@ -52,6 +51,10 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['first_name', 'last_name', 'gender', 'dob', 'pob', 'org_ins',
                   'ofc_add', 'ofc_number', 'nationality', 'fax', 'secondary_email']
+
+        # widgets = {
+        #     'course':
+        # }
 
 
 class SignUpForm(UserCreationForm):
