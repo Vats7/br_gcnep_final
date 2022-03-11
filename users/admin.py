@@ -82,10 +82,10 @@ class CustomUserAdmin(BaseUserAdmin):
             kwargs["queryset"] = UserType.objects.filter(type__in=types)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
-    # def get_readonly_fields(self, request, obj=None):
-    #     if obj is not None and obj.is_staff:
-    #         return self.readonly_fields + ('types',)
-    #     return self.readonly_fields
+    def get_readonly_fields(self, request, obj=None):
+        if obj is not None and obj.is_staff:
+            return self.readonly_fields + ('types',)
+        return self.readonly_fields
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)

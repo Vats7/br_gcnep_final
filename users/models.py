@@ -117,11 +117,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         if self.is_mod and self.is_superuser:
             raise ValidationError({'is_mod': 'Select Only One'})
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            if self.is_mod:
-                self.is_staff = True
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.id:
+    #         if self.is_mod or self.is_superuser:
+    #             self.is_staff = True
+    #     super().save(*args, **kwargs)
 
 
 class ModeratorProfile(models.Model):

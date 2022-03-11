@@ -11,6 +11,7 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         if instance.is_superuser:
             obj, created = UserType.objects.get_or_create(type='ADMIN')
             instance.types.add(obj)
+            instance.is_staff = True
             instance.save()
         elif instance.is_mod:
             user_type, created = UserType.objects.get_or_create(type='MODERATOR') #get or create TYPE
