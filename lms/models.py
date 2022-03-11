@@ -96,9 +96,9 @@ class Training(BaseModel):
 
     def clean(self):
         if self.start_at and self.end_at:
-            now = timezone.localtime(timezone.now())
-            if self.start_at <= now:
-                raise ValidationError('Start Time can not be the current time')
+            # now = timezone.localtime(timezone.now())
+            # if self.start_at <= now:
+            #     raise ValidationError('Start Time can not be the current time')
             if self.start_at >= self.end_at:
                 raise ValidationError('Start Time Can Not be more than or equal to end Time')
         if self.training_type == 'OTHER':
