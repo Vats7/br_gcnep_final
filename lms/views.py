@@ -12,7 +12,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from lms.models import Training, Enrollment
 import boto3
 from django.contrib.auth.decorators import user_passes_test
-from . forms import EnrollmentForm, TrainingForm, BulkAddAttendeeForm
+from . forms import EnrollmentForm, TrainingForm, BulkAddAttendeeForm, TestForm
 
 
 client = boto3.client(
@@ -182,23 +182,38 @@ def start_meeting(request, pk):
 @staff_member_required
 def create_training(request):
     if request.method == 'POST':
-        form = TrainingForm(request.POST, request.FILES)
+        form = TestForm(request.POST, request.FILES)
         if form.is_valid():
-            training = form.save(commit=False)
-            training.created_by = request.user
-            training.save()
-            messages.success(request, 'Training created successfully')
+            title = form.cleaned_data['title']
+            description = form.cleaned_data['description']
+            course = form.cleaned_data['course']
+            training_type = form.cleaned_data['training_type']
+            quizzes = form.cleaned_data['quiz']
+            assignments = form.cleaned_data['assignment']
+            main_image = form.cleaned_data['main_image']
+            start_at = form.cleaned_data['start_at']
+            end_at = form.cleaned_data['end_at']
+
+            training = Training.objects.create(
+                title=title,
+                description=description,
+                course=course,
+                training_type=training_type,
+                main_image=main_image,
+                start_at=start_at,
+                end_at=end_at,
+                created_by=request.user,
+            )
+
+            training.quiz.add(*quizzes)
+            training.assignment.add(*assignments)
             return redirect('lms:my_trainings')
         else:
-            errors = form.errors
-            for e in errors:
-                print(e)
-            # messages.add_message(request, messages.ERROR, 'error')
-            # messages.error(request, form.errors)
-            return redirect('lms:create_training')
+            print(form.errors)
+            return render(request, 'lms/create_training.html', {'form': form})
     else:
-        form = TrainingForm()
-        return render(request, 'lms/create_training.html', {'form': form})
+        form = TestForm()
+    return render(request, 'lms/create_training.html', {'form': form})
 
 
 @staff_member_required
@@ -316,6 +331,13 @@ def my_trainings_search_staff(request):
                 )
             data_dict = {"html_from_view": html}
             return JsonResponse(data=data_dict, safe=False)
+
+
+
+
+
+
+
 
 
 

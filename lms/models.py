@@ -89,18 +89,16 @@ class Training(BaseModel):
 
     @property
     def is_started(self):
-        # now = timezone.now()
         now = timezone.localtime(timezone.now())
-        print(now)
-        ##remove this if
-        if self.start_at is None:
-            return True
         if now >= self.start_at:
             return True
         return False
 
     def clean(self):
         if self.start_at and self.end_at:
+            now = timezone.localtime(timezone.now())
+            if self.start_at <= now:
+                raise ValidationError('Start Time can not be the current time')
             if self.start_at >= self.end_at:
                 raise ValidationError('Start Time Can Not be more than or equal to end Time')
         if self.training_type == 'OTHER':
@@ -142,18 +140,16 @@ class Enrollment(BaseModel):
         trainer = UserType.objects.get(type='TRAINER')
         trainee = UserType.objects.get(type='TRAINEE')
         observer = UserType.objects.get(type='OBSERVER')
-        print(self.permission)
-        print(self.user.types.all())
-        types = self.user.types.all()
-        if trainer not in types:
+        user_types = self.user.types.all()
+        if trainer not in user_types:
             if self.permission in ['PRIMARY', 'OTHER']:
                 raise ValidationError('Selected User does not have required permission')
 
-        if trainee not in types:
+        if trainee not in user_types:
             if self.permission == 'TRAINEE':
                 raise ValidationError('Selected User does not have required permission')
 
-        if observer not in types:
+        if observer not in user_types:
             if self.permission == 'OBSERVER':
                 raise ValidationError('Selected User does not have required permission')
 

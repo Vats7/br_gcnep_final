@@ -3,6 +3,9 @@
 {% load crispy_forms_tags %}
 
     {% block head %}
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
         {{ form.media.css }}
     {% endblock %}
 
@@ -28,10 +31,10 @@
                         <div class="col-lg-8">
                             <div class="card">
                                 <div class="card-body">
-                                    <form id="create_training" method="POST" enctype="multipart/form-data">
+                                    <form method="POST" action="{% url 'lms:create_training' %}" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         {{ form|crispy }}
-                                        <button type="submit" class="btn btn-primary mt-3">Create</button>
+                                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                     </form>
                                 </div>
                             </div>
@@ -46,6 +49,44 @@
 
 
 {% block scripts %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{ form.media.js }}
+    <script>
+        $(function () {
+          $("#id_start_at").datetimepicker();
+          $("#id_end_at").datetimepicker();
+        });
+    </script>
 {% endblock %}
+
+{#<!DOCTYPE html>#}
+{#{% load crispy_forms_tags %}#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1">#}
+{#    <title>Title</title>#}
+{#    #}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>#}
+{#    #}
+{#    <!-- XDSoft DateTimePicker -->#}
+{#  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />#}
+{#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>#}
+{#    {{ form.media.css }}#}
+{#</head>#}
+{#<body>#}
+{#    <form method="POST" action="{% url 'lms:test_view' %}">#}
+{#        {% csrf_token %}#}
+{#        {{ form|crispy }}#}
+{#        <button type="submit" class="btn btn-primary mt-3">Submit</button>#}
+{#    </form>#}
+{##}
+{#    {{ form.media.js }}#}
+{#    <script>#}
+{#        $(function () {#}
+{#          $("#id_date").datetimepicker();#}
+{#        });#}
+{#    </script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>#}
+{#</body>#}
+{#</html>#}

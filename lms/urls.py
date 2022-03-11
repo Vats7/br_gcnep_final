@@ -22,6 +22,7 @@ urlpatterns = [
     path('all_trainings_search', views.all_trainings_search, name='all_trainings_search'),
     path('my_trainings_search_staff', views.my_trainings_search_staff, name='my_trainings_search_staff'),
     path('my_trainings_search_staff', views.my_trainings_search_staff, name='my_trainings_search_staff'),
+    # path('training/test/', views.test_view, name='test_view')
 
 
 
