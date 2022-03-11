@@ -1,3 +1,4 @@
+{% if trainings %}
 <div class="row">
     <div class="col-lg-12">
         <div class="card ">
@@ -83,3 +84,19 @@
         </div>
     </div>
 </div>
+{% else %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card ">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            No Trainings
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
