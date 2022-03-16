@@ -1,3 +1,4 @@
+import botocore
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -8,6 +9,14 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
 from cms.models import Quiz, Assignment
 from users.models import UserProfile, UserType
+import boto3
+
+client = boto3.client(
+    'chime-sdk-meetings',
+    aws_access_key_id=settings.AWS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_KEY,
+    region_name='us-east-1'
+)
 
 
 def validate_file_size(value):
@@ -93,6 +102,15 @@ class Training(BaseModel):
         if now >= self.start_at:
             return True
         return False
+
+    @property
+    def has_finished(self):
+        if self.chime_id:
+            try:
+                client.get_meeting(MeetingId=self.chime_id)
+                return False
+            except botocore.exceptions.ClientError as err:
+                return True
 
     def clean(self):
         if self.start_at and self.end_at:

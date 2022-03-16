@@ -219,18 +219,39 @@ def create_training(request):
 @staff_member_required
 def update_training(request, pk):
     training = get_object_or_404(Training, pk=pk)
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if request.method == 'POST':
+        form = TestForm(request.POST, request.FILES, inital=training)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            description = form.cleaned_data['description']
+            course = form.cleaned_data['course']
+            training_type = form.cleaned_data['training_type']
+            quizzes = form.cleaned_data['quiz']
+            assignments = form.cleaned_data['assignment']
+            main_image = form.cleaned_data['main_image']
+            start_at = form.cleaned_data['start_at']
+            end_at = form.cleaned_data['end_at']
 
-    if is_ajax:
-        if request.method == 'POST':
-            form = TrainingForm(request.POST, instance=training)
-            if form.is_valid():
-                form.save()
-                return JsonResponse({'success': 'enrollment created'})
-            return JsonResponse({'errors': form.errors}, status=400)
-        return JsonResponse({'status': 'Invalid request bcoz only post is allowed '}, status=400)
-    return HttpResponseBadRequest('Invalid request (only ajax allowed)')
+            training = Training.objects.create(
+                title=title,
+                description=description,
+                course=course,
+                training_type=training_type,
+                main_image=main_image,
+                start_at=start_at,
+                end_at=end_at,
+                created_by=request.user,
+            )
 
+            training.quiz.add(*quizzes)
+            training.assignment.add(*assignments)
+            return redirect('lms:my_trainings')
+        else:
+            print(form.errors)
+            return render(request, 'lms/create_training.html', {'form': form})
+    else:
+        form = TestForm()
+    return render(request, 'lms/create_training.html', {'form': form})
 
 
 @staff_member_required

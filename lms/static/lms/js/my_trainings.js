@@ -1,5 +1,14 @@
 console.log('my_trainings')
 
+;(function(){
+    const updateModal = new bootstrap.Modal(document.getElementById('updateModal'))
+    htmx.on('htmx:afterSwap', (e) =>{
+        if(e.detail.target.id === 'dialogue')
+            updateModal.show()
+    })
+})()
+
+
 
 const user_input = $("#user-input")
 const search_icon = $('#search-icon')
@@ -7,6 +16,8 @@ const results = $('#search-results')
 const endpoint = '/my_trainings_search_staff'
 const delay_by_in_ms = 700
 let scheduled_function = false
+
+
 
 let ajax_call = function (endpoint, request_parameters) {
     $.getJSON(endpoint, request_parameters)

@@ -20,6 +20,7 @@ let ajax_call = function (endpoint, request_parameters) {
                 results.fadeTo('slow', 1)
                 // stop animating search icon
                 search_icon.removeClass('blink')
+                // search_icon.hide()
             })
         })
 }
@@ -33,6 +34,7 @@ user_input.on('keyup', function () {
 
     // start animating the search icon with the CSS class
     search_icon.addClass('blink')
+    // search_icon.show()
 
     // if scheduled_function is NOT false, cancel the execution of the function
     if (scheduled_function) {

@@ -16,6 +16,7 @@ urlpatterns = [
     path('<str:pk>/', views.join_meeting, name='join_meeting'),
 
     path('training/create/', views.create_training, name='create_training'),
+    path('<str:pk>/update', views.update_training, name='update_training'),
     path('<str:pk>/enroll', views.create_enrollment, name='create_enrollment'),
     path('<str:pk>/bulk/enroll', views.bulk_add_attendee, name='bulk_add_attendee'),
 
