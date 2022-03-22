@@ -4,6 +4,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+    {% include 'lms/includes/messages.html' %}
     <div class="account-pages my-5 pt-5">
         <div class="container">
             <div class="row justify-content-center">
@@ -14,7 +15,7 @@
                                 <h5 class="text-white font-size-20">Welcome Back !</h5>
                                 <p class="text-white-50">Registration for GCNEP.</p>
                                 <a href="" class="logo logo-admin">
-                                    <img src="{% static 'lms/images/logo-sm.png' %}" height="50" alt="logo">
+                                    <img src="{% static 'images/logo-sm.png' %}" height="50" alt="logo">
                                 </a>
                             </div>
                         </div>

@@ -5,7 +5,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
@@ -13,7 +13,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth import get_user_model
 from django.views.generic import ListView
 
-from users.forms import LoginForm, SignUpForm, UserProfileForm
+from users.forms import LoginForm, SignUpForm, UserProfileForm, UserChangeFormNew, UserCreationFormNew
 from django.views.decorators.cache import cache_control
 from django.db.models.query_utils import Q
 
@@ -31,9 +31,10 @@ def register_view(request):
             print(user)
             login(request, user)
             messages.success(request, "Registration successful.")
-            return redirect("users:profile")
+            return redirect("lms:home")
         messages.error(request, form.errors)
-    form = SignUpForm()
+    else:
+        form = SignUpForm()
     return render(request=request, template_name="users/register.html", context={"form": form})
 
 
@@ -51,7 +52,7 @@ def login_view(request):
                 messages.success(request, f'Successfully logged in as {user.email}')
                 return redirect('lms:home')
             else:
-                messages.error(request, "Invalid email or password.")
+                messages.error(request, "Already exists")
         else:
             messages.error(request, "Invalid email or password.")
     form = LoginForm()
@@ -87,9 +88,7 @@ def password_reset_request(request):
                     try:
                         send_mail(subject, email, 'admin@example.com', [user.email], fail_silently=False)
                     except BadHeaderError:
-
                         return HttpResponse('Invalid header found.')
-
                     messages.success(request, 'A message with reset password instructions has been sent to your inbox.')
                     return redirect("users:login")
             messages.error(request, 'An invalid email has been entered.')
@@ -151,3 +150,27 @@ def user_search(request):
                 )
                 data_dict = {"html_from_view": html}
                 return JsonResponse(data=data_dict, safe=False)
+
+
+def create_user(request):
+    if request.method == 'POST':
+        form = UserCreationFormNew(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('users:user_list')
+    else:
+        form = UserCreationFormNew()
+    return render(request, 'users/create_user.html', {'form': form,})
+
+
+def update_user(request, id):
+    user = get_object_or_404(User, id=id)
+
+    if request.method == 'POST':
+        form = UserChangeFormNew(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('users:user_list')
+    else:
+        form = UserChangeFormNew(instance=user)
+    return render(request, 'users/update_user.html', {'form': form, 'user': user})

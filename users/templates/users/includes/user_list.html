@@ -18,7 +18,12 @@
                                 <tbody>
                                 {% for u in users %}
                                     <tr>
-                                        <td>{{ u.name }}</td>
+                                        <td>
+                                            <a href="{% url 'users:update_user' u.id %}">
+                                                {{ u.name }}
+                                            </a>
+                                        </td>
+{#                                        <td>{{ u.name }}</td>#}
                                         <td>{{ u.email }}</td>
                                         <td>{{ u.types.all|join:", " }}</td>
                                         <td>{{ u.is_active }}</td>

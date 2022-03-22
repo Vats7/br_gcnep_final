@@ -40,6 +40,50 @@ class UserChangeForm(forms.ModelForm):
         fields = ('email', 'password', 'name', 'is_active', 'is_staff', 'is_superuser', 'types')
 
 
+class UserCreationFormNew(forms.ModelForm):
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'name', 'password1', 'password2',  'is_mod', 'is_superuser')
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError("Passwords don't match")
+        return password2
+
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+
+
+class UserChangeFormNew(forms.ModelForm):
+    types = forms.ModelMultipleChoiceField(
+        queryset=UserType.objects.filter(type__in=['TRAINER', 'TRAINEE', 'OBSERVER']),
+        widget=forms.CheckboxSelectMultiple()
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ('is_active', 'email', 'name', 'types',)
+
+    def __init__(self, *args, **kwargs):
+        super(UserChangeFormNew, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance.is_staff:
+            del self.fields['types']
+
+
+
+
+
 class LoginForm(forms.Form):
     """user login form"""
     email = forms.EmailField()

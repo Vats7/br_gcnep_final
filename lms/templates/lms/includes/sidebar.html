@@ -46,7 +46,7 @@
                             <span>Setting</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="change-password.html">Change password</a></li>
+                            <li><a href="">Change password</a></li>
                         </ul>
                     </li>
                 {% else %}
@@ -63,6 +63,9 @@
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
                             <li><a href="{% url 'users:user_list' %}">Access Users list </a></li>
+                        </ul>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'users:create_user' %}">Create Account</a></li>
                         </ul>
                     </li>
                     <li>
@@ -123,7 +126,7 @@
                             <span>Setting</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="change-password.html">Change password</a></li>
+                            <li><a href="">Change password</a></li>
                         </ul>
                     </li>
                 {% endif %}

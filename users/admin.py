@@ -2,9 +2,6 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 from django.utils.html import format_html
-from django.utils.translation import ngettext
-
-# from lms.admin import EnrollmentInline
 from .forms import UserAdminCreationForm, UserChangeForm
 from .models import CustomUser, UserProfile, ModeratorProfile, UserType, Document, Education, Employment
 

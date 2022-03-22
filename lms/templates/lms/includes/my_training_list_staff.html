@@ -71,9 +71,14 @@
                                         {% else %}
                                             {% if t.has_finished %}
                                                 <td>
-                                                    <button class="btn btn-primary" disabled>
-                                                        Finished
-                                                    </button>
+                                                    <a href="{% url 'lms:start_training' t.unique_id %}">
+                                                        <button class="btn btn-primary">
+                                                            Restart
+                                                        </button>
+                                                    </a>
+{#                                                    <button class="btn btn-primary" disabled>#}
+{#                                                        Finished#}
+{#                                                    </button>#}
                                                 </td>
                                             {% else %}
                                                 <td>
