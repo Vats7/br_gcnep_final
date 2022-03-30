@@ -1,0 +1,70 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+    <div id="layout-wrapper">
+        {% include 'lms/includes/top_menu.html' %}
+        {% include 'lms/includes/sidebar.html' %}
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    <div class="page-title-box">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="page-title">My Assignments</h6>
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="#">GCNEP</a></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Search by</h4>
+                                    <form id="search-form" class="repeater">
+                                        <div data-repeater-list="group-a">
+                                            <div data-repeater-item class="row">
+                                                <div class="mb-3 col-lg-3">
+                                                    <label class="form-label" for="query">Search...</label>
+                                                    <i id="search-icon" class="fas fa-search"></i>
+                                                    <input type="text" id="user-input" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end search -->
+                    <div id="search-results">
+                        {% include 'cms/includes/all_assignments_list.html' %}
+                    </div>
+                </div> <!-- container-fluid -->
+            </div>
+            <!-- End Page-content -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            ©
+                            <script>document.write(new Date().getFullYear())</script>
+                            GCNEP</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="{% static 'lms/js/all_assignments.js' %}" defer></script>
+{% endblock %}
+
+
+
+
+

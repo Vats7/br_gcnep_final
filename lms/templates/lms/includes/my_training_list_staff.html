@@ -53,11 +53,21 @@
                                                data-bs-target="#updateModal"> <i
                                                     class="fas fa-eye"></i>
                                             </a>
-                                            <a class="btn btn-danger btn-sm edit"
+{#                                            <a class="btn btn-danger btn-sm edit"#}
+{#                                               id="deleteModalBtn"#}
+{#                                               title="delete"#}
+{#                                               data-bs-toggle="modal"#}
+{#                                               data-bs-target="#deleteModal"#}
+{#                                               data-pk="{{ t.unique_id }}"#}
+{#                                            > <i#}
+{#                                                    class="fas fa-trash"></i>#}
+{#                                            </a>#}
+                                            <a href="{% url 'lms:delete_training' pk=t.unique_id %}"
+                                               class="confirm-delete"
                                                title="Delete"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#deleteModal"><i
-                                                    class="fas fa-trash"></i>
+                                               data-toggle="modal"
+                                               data-target="#confirmDeleteModal"
+                                               id="deleteButton{{t.unique_id}}">
                                             </a>
                                         </td>
                                         {% if not t.chime_id %}
@@ -76,9 +86,6 @@
                                                             Restart
                                                         </button>
                                                     </a>
-{#                                                    <button class="btn btn-primary" disabled>#}
-{#                                                        Finished#}
-{#                                                    </button>#}
                                                 </td>
                                             {% else %}
                                                 <td>

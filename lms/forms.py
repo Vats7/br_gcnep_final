@@ -1,14 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import TextInput
-from django.utils import timezone
 from django_select2 import forms as s2forms
-
-from cms.models import Assignment, Quiz
-from home.models import Course
 from users.models import CustomUser, UserType
 from .models import Training, Enrollment
-from .widgets import XDSoftDateTimePickerInput
 
 
 class PmKeyWidget(s2forms.ModelSelect2Widget):
@@ -38,60 +33,22 @@ class UserM2MWidget(s2forms.ModelSelect2MultipleWidget):
         "name__icontains",
     ]
 
-# class TrainingForm(forms.Form):
-#     title = forms.CharField(
-#         max_length=50,
-#         label='Title',
-#     )
-#     description = forms.CharField(
-#         max_length=200,
-#         label='Description',
-#     )
-#     course = forms.ModelChoiceField(
-#         queryset=Course.objects.all(),
-#         label='Course'
-#     )
-#     training_type = forms.ChoiceField(choices=)
-
 
 class TrainingForm(forms.ModelForm):
-    # start_at = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'])
-    # end_at = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'])
+    start_at = forms.DateTimeField(input_formats=['%Y/%m/%d %H:%M'])
+    end_at = forms.DateTimeField(input_formats=['%Y/%m/%d %H:%M'])
 
     class Meta:
         model = Training
         fields = ['title', 'description', 'course', 'training_type', 'other',
                   'quiz', 'assignment', 'main_image', 'content', 'director', 'coordinator',
-                  ]#'start_at', 'end_at'
+                  'start_at', 'end_at']
         widgets = {
             'title': TextInput(attrs={'class': 'form-control'}),
-            # 'start_at': DateInput(attrs={'type': 'date', 'id': 'example-date-input', 'class': 'form-control'}),
-            # 'end_at': DateInput(attrs={'id': 'example-date-input', 'class': 'form-control'}),
             'course': PmKeyWidget,
             'quiz': M2MWidget,
             'assignment': M2MWidget,
-            # 'start_at': XDSoftDateTimePickerInput(),
-            # 'end_at': XDSoftDateTimePickerInput()
-
         }
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     # self.fields['course'].queryset = Course.objects.none()
-    #     #self.fields['quiz'].queryset = Quiz.objects.none()
-    #     self.fields['assignment'].queryset = Assignment.objects.none()
-    # #
-    # #     if 'course' in self.data:
-    # #         self.fields['course'].queryset = Course.objects.all()
-    # #
-    # #     if 'quiz' in self.data:
-    # #         self.fields['quiz'].queryset = Quiz.objects.all()
-    # #
-    #     if 'assignment' in self.data:
-    #         self.fields['assignment'].queryset = Assignment.objects.all()
-
-
-# User = get_user_model()
 
 
 class EnrollmentForm(forms.ModelForm):
@@ -140,78 +97,47 @@ class BulkAddAttendeeForm(forms.Form):
                         raise ValidationError('ONE OR MORE USERS does not have required permission')
 
 
-# class TestForm(forms.ModelForm):
-#     start_at = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'])
-#     end_at = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'])
-#
-#     class Meta:
-#         model = Training
-#         fields = ['title', 'description', 'course', 'training_type', 'other',
-#                   'quiz', 'assignment', 'main_image', 'content', 'director', 'coordinator',
-#                   'start_at', 'end_at']
-#         widgets = {
-#             'title': TextInput(attrs={'class': 'form-control'}),
-#             # 'start_at': DateInput(attrs={'type': 'date', 'id': 'example-date-input', 'class': 'form-control'}),
-#             # 'end_at': DateInput(attrs={'id': 'example-date-input', 'class': 'form-control'}),
-#             'course': PmKeyWidget,
-#             'quiz': M2MWidget,
-#             'assignment': M2MWidget,
-#             # 'start_at': XDSoftDateTimePickerInput(),
-#             # 'end_at': XDSoftDateTimePickerInput()
-#
-#         }
-
 # class TestForm(forms.Form):
-#     date = forms.DateTimeField(
-#         input_formats=['%d/%m/%Y %H:%M'],
-#         #widget=XDSoftDateTimePickerInput()
+#     TRAINING_TYPE = (
+#         ('WORKSHOP', 'Workshop'),
+#         ('PROGRAM', 'Program'),
+#         ('MEETING', 'Meeting'),
+#         ('OTHER', 'Other')
 #     )
-#     user = forms.ModelMultipleChoiceField(
-#         queryset=CustomUser.objects.all(),
-#         widget=UserM2MWidget,
+#     title = forms.CharField(
+#         max_length=50,
+#         label='Title',
 #     )
-
-class TestForm(forms.Form):
-    TRAINING_TYPE = (
-        ('WORKSHOP', 'Workshop'),
-        ('PROGRAM', 'Program'),
-        ('MEETING', 'Meeting'),
-        ('OTHER', 'Other')
-    )
-    title = forms.CharField(
-        max_length=50,
-        label='Title',
-    )
-    description = forms.CharField(
-        max_length=200,
-        label='Description',
-    )
-    course = forms.ModelChoiceField(
-        queryset=Course.objects.all(),
-        label='Course',
-        widget=PmKeyWidget
-    )
-    training_type = forms.ChoiceField(choices=TRAINING_TYPE)
-    quiz = forms.ModelMultipleChoiceField(
-        queryset=Quiz.objects.all(),
-        widget=M2MWidget,
-    )
-    assignment = forms.ModelMultipleChoiceField(
-        queryset=Assignment.objects.all(),
-        widget=M2MWidget,
-    )
-    main_image = forms.ImageField()
-    start_at = forms.DateTimeField(input_formats=['%Y/%m/%d %H:%M'])
-    end_at = forms.DateTimeField(input_formats=['%Y/%m/%d %H:%M'])
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start = cleaned_data.get("start_at")
-        end = cleaned_data.get("end_at")
-
-        if start and end:
-            now = timezone.localtime(timezone.now())
-            if start <= now:
-                self.add_error('start_at', 'can not be current time')
-            if start >= end:
-                self.add_error('end_at', 'error')
+#     description = forms.CharField(
+#         max_length=200,
+#         label='Description',
+#     )
+#     course = forms.ModelChoiceField(
+#         queryset=Course.objects.all(),
+#         label='Course',
+#         widget=PmKeyWidget
+#     )
+#     training_type = forms.ChoiceField(choices=TRAINING_TYPE)
+#     quiz = forms.ModelMultipleChoiceField(
+#         queryset=Quiz.objects.all(),
+#         widget=M2MWidget,
+#     )
+#     assignment = forms.ModelMultipleChoiceField(
+#         queryset=Assignment.objects.all(),
+#         widget=M2MWidget,
+#     )
+#     main_image = forms.ImageField()
+#     start_at = forms.DateTimeField(input_formats=['%Y/%m/%d %H:%M'])
+#     end_at = forms.DateTimeField(input_formats=['%Y/%m/%d %H:%M'])
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         start = cleaned_data.get("start_at")
+#         end = cleaned_data.get("end_at")
+#
+#         if start and end:
+#             now = timezone.localtime(timezone.now())
+#             if start <= now:
+#                 self.add_error('start_at', 'can not be current time')
+#             if start >= end:
+#                 self.add_error('end_at', 'error')

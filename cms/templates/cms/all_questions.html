@@ -1,0 +1,106 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+    <div id="layout-wrapper">
+        {% include 'lms/includes/top_menu.html' %}
+        {% include 'lms/includes/sidebar.html' %}
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    <div class="page-title-box">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                {% if not request.user.is_staff %}
+                                    <h6 class="page-title">ALL Questions created by {{ request.user.name }}</h6>
+                                {% else %}
+                                    <h6 class="page-title">ALL Questions</h6>
+                                {% endif %}
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="#">GCNEP</a></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Search by</h4>
+                                    <form id="search-form" class="repeater">
+                                        <div data-repeater-list="group-a">
+                                            <div data-repeater-item class="row">
+                                                <div class="mb-3 col-lg-3">
+                                                    <label class="form-label" for="query">Search...</label>
+                                                    <i id="search-icon" class="fas fa-search"></i>
+                                                    <input type="text" id="user-input" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-info mb-2" data-bs-toggle="modal"
+                                data-bs-target="#addQuestionModal">
+                           Add Question
+                        </button>
+                    </div>
+                    <!-- end search -->
+                    <div id="search-results">
+                        {% include 'cms/includes/all_questions_list.html' %}
+                    </div>
+{#                    <div>#}
+{#                        <a href="{% url 'cms:create_question' %}">#}
+{#                            <button class="btn btn-primary">Create</button>#}
+{#                        </a>#}
+{#                    </div>#}
+                </div> <!-- container-fluid -->
+            </div>
+            <!-- End Page-content -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            ©
+                            <script>document.write(new Date().getFullYear())</script>
+                            GCNEP</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Question</h5>
+                    <button type="button" class="btn-close add-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="post-form" autocomplete="off" method="post" action="{% url 'cms:create_question' %}">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger add-modal-close" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" id="add-btn" class="btn btn-success">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'lms/js/all_assignments.js' %}" defer></script>
+{% endblock %}
+
+
+
+
+

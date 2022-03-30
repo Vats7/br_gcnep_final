@@ -1,15 +1,12 @@
 {% load static %}
+{% load custom_tags %}
 
 
-<!-- ========== Left Sidebar Start ========== -->
 <div class="vertical-menu">
-
     <div data-simplebar class="h-100">
-
-        <!--- Sidemenu -->
         <div id="sidebar-menu">
-            <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
+
                 {% if not request.user.is_staff %}
                     <!--dash-->
                     <li>
@@ -36,9 +33,43 @@
                             <span>Course Management</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="#">My Courses</a></li>
+                            <li><a href="{% url 'home:my_courses' %}">My Courses</a></li>
                         </ul>
                     </li>
+                    <!--Study content-->
+
+                    {% if request.user|has_type:"TRAINER" %}
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ti-book"></i>
+                                <span>Study Content Management</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'cms:all_assignments' %}">All Assignments</a></li>
+                            </ul>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'cms:all_quizzes' %}">All Quizzes</a></li>
+                            </ul>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'cms:all_questions' %}">All Questions</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    {% if request.user|has_type:"TRAINEE" %}
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="ti-book"></i>
+                                <span>Learning Content Management</span>
+                            </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'cms:my_assignments' %}">My Assignments</a></li>
+                            </ul>
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'cms:my_quizzes' %}">My Quizzes</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    <!--Learning content-->
                     <!--setting-->
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -91,6 +122,22 @@
                             <li><a href="{% url 'home:create_course' %}">Create</a></li>
                         </ul>
                     </li>
+                    <!--Study content-->
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ti-book"></i>
+                            <span>Study Content Management</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'cms:all_assignments' %}">All Assignments</a></li>
+                        </ul>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'cms:all_quizzes' %}">All Quizzes</a></li>
+                        </ul>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'cms:all_questions' %}">All Questions</a></li>
+                        </ul>
+                    </li>
                     <!--Roles-->
                     <li>
                         <a href="" class="waves-effect">
@@ -110,13 +157,6 @@
                         <a href="#" class="waves-effect">
                             <i class="ti-receipt"></i>
                             <span>Report management </span>
-                        </a>
-                    </li>
-                    <!--Study content-->
-                    <li>
-                        <a href="#" class="waves-effect">
-                            <i class="ti-bar-chart-alt"></i>
-                            <span>Study Content Management</span>
                         </a>
                     </li>
                     <!--setting-->

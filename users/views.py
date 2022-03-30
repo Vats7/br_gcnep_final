@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
@@ -16,6 +17,8 @@ from django.views.generic import ListView
 from users.forms import LoginForm, SignUpForm, UserProfileForm, UserChangeFormNew, UserCreationFormNew
 from django.views.decorators.cache import cache_control
 from django.db.models.query_utils import Q
+
+from users.models import UserType
 
 User = get_user_model()
 
@@ -41,6 +44,7 @@ def register_view(request):
 @cache_control(no_cache=True, must_revalidate=True)
 def login_view(request):
     if request.method == "POST":
+        # trainer = UserType.objects.get(type='TRAINER')
         form = LoginForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -52,11 +56,12 @@ def login_view(request):
                 messages.success(request, f'Successfully logged in as {user.email}')
                 return redirect('lms:home')
             else:
-                messages.error(request, "Already exists")
+                messages.error(request, "Not Registered")
         else:
             messages.error(request, "Invalid email or password.")
-    form = LoginForm()
-    return render(request=request, template_name="users/login_new.html", context={"login_form": form})
+    else:
+        form = LoginForm()
+    return render(request=request, template_name="users/login_new.html", context={"login_form": form,})
 
 
 @cache_control(no_cache=True, must_revalidate=True)
@@ -152,6 +157,7 @@ def user_search(request):
                 return JsonResponse(data=data_dict, safe=False)
 
 
+@staff_member_required
 def create_user(request):
     if request.method == 'POST':
         form = UserCreationFormNew(request.POST)
@@ -163,6 +169,7 @@ def create_user(request):
     return render(request, 'users/create_user.html', {'form': form,})
 
 
+@staff_member_required
 def update_user(request, id):
     user = get_object_or_404(User, id=id)
 

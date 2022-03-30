@@ -4,15 +4,17 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.decorators.http import require_http_methods
 from lms.models import Training, Enrollment
 import boto3
 from django.contrib.auth.decorators import user_passes_test
-from . forms import EnrollmentForm, TrainingForm, BulkAddAttendeeForm, TestForm
+
+from users.models import UserType
+from .forms import EnrollmentForm, BulkAddAttendeeForm, TrainingForm
 
 
 client = boto3.client(
@@ -29,7 +31,6 @@ def index(request):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-#@staff_member_required
 def all_trainings(request):
     trainings = Training.objects.all()
     context = {
@@ -47,21 +48,6 @@ def my_training_list(request):
     return render(request, 'lms/training_list_user.html', {
         'trainings': trainings,
     })
-
-# class MyTrainingList(ListView):
-#     context_object_name = 'trainings'
-#     model = Training
-#     paginate_by = 5
-#
-#     def get_queryset(self):
-#         return self.request.user.training_set.all()
-#
-#     def get_context_data(self, **kwargs):
-#         # Call the base implementation first to get a context
-#         context = super().get_context_data(**kwargs)
-#         # Add in a QuerySet of all the books
-#         context['enroll_form'] = EnrollmentForm()
-#         return context
 
 
 def training_detail(request, pk):
@@ -175,44 +161,100 @@ def start_meeting(request, pk):
         for key, value in req_dict.items():
             Enrollment.objects.filter(user__unique_id=key).update(join_token=value['JoinToken'],
                                                                   attendee_id=value['AttendeeId'])
-    
+
     return redirect('lms:my_trainings')
+
+
+# @staff_member_required
+# def create_training(request):
+#     if request.method == 'POST':
+#         form = TestForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             title = form.cleaned_data['title']
+#             description = form.cleaned_data['description']
+#             course = form.cleaned_data['course']
+#             training_type = form.cleaned_data['training_type']
+#             quizzes = form.cleaned_data['quiz']
+#             assignments = form.cleaned_data['assignment']
+#             main_image = form.cleaned_data['main_image']
+#             start_at = form.cleaned_data['start_at']
+#             end_at = form.cleaned_data['end_at']
+# 
+#             training = Training.objects.create(
+#                 title=title,
+#                 description=description,
+#                 course=course,
+#                 training_type=training_type,
+#                 main_image=main_image,
+#                 start_at=start_at,
+#                 end_at=end_at,
+#                 created_by=request.user,
+#             )
+# 
+#             training.quiz.add(*quizzes)
+#             training.assignment.add(*assignments)
+#             return redirect('lms:my_trainings')
+#         else:
+#             print(form.errors)
+#             return render(request, 'lms/create_training.html', {'form': form})
+#     else:
+#         form = TestForm()
+#     return render(request, 'lms/create_training.html', {'form': form})
+
+# @require_http_methods(['POST'])
+# def start_meeting(request, pk):
+#     training = get_object_or_404(Training, pk=pk)
+#     attendees_ids = [u.unique_id for u in training.attendees.all()]
+#     attendees = []
+#     for i in attendees_ids:
+#         attendees.append({
+#             'ExternalUserId': str(i)
+#         })
+#
+#     res = client.create_meeting_with_attendees(
+#         MediaRegion='ap-south-1',
+#         ExternalMeetingId=str(training.unique_id),
+#         MeetingFeatures={
+#             'Audio': {
+#                 'EchoReduction': 'AVAILABLE'
+#             }
+#         },
+#         Attendees=attendees
+#     )
+#
+#     training.chime_id = res['Meeting']['MeetingId']
+#     training.save()
+#
+#     id_list = [i['ExternalUserId'] for i in res['Attendees']]
+#
+#     info_list = [{k: v for k, v in d.items() if k != 'ExternalUserId'} for d in res['Attendees']]
+#
+#     req_dict = dict(zip(id_list, info_list))
+#
+#     with transaction.atomic():
+#         for key, value in req_dict.items():
+#             Enrollment.objects.filter(
+#                 user__unique_id=key
+#             ).update(
+#                 join_token=value['JoinToken'],
+#                 attendee_id=value['AttendeeId']
+#             )
+#     return HttpResponse()
 
 
 @staff_member_required
 def create_training(request):
     if request.method == 'POST':
-        form = TestForm(request.POST, request.FILES)
+        form = TrainingForm(request.POST, request.FILES or None)
         if form.is_valid():
-            title = form.cleaned_data['title']
-            description = form.cleaned_data['description']
-            course = form.cleaned_data['course']
-            training_type = form.cleaned_data['training_type']
-            quizzes = form.cleaned_data['quiz']
-            assignments = form.cleaned_data['assignment']
-            main_image = form.cleaned_data['main_image']
-            start_at = form.cleaned_data['start_at']
-            end_at = form.cleaned_data['end_at']
-
-            training = Training.objects.create(
-                title=title,
-                description=description,
-                course=course,
-                training_type=training_type,
-                main_image=main_image,
-                start_at=start_at,
-                end_at=end_at,
-                created_by=request.user,
-            )
-
-            training.quiz.add(*quizzes)
-            training.assignment.add(*assignments)
+            new_training = form.save(commit=False)
+            new_training.created_by = request.user
+            new_training.save()
+            form.save_m2m()
+            messages.success(request, 'Training Created')
             return redirect('lms:my_trainings')
-        else:
-            print(form.errors)
-            return render(request, 'lms/create_training.html', {'form': form})
     else:
-        form = TestForm()
+        form = TrainingForm()
     return render(request, 'lms/create_training.html', {'form': form})
 
 
@@ -220,38 +262,22 @@ def create_training(request):
 def update_training(request, pk):
     training = get_object_or_404(Training, pk=pk)
     if request.method == 'POST':
-        form = TestForm(request.POST, request.FILES, inital=training)
+        form = TrainingForm(request.POST, request.FILES, instance=training)
         if form.is_valid():
-            title = form.cleaned_data['title']
-            description = form.cleaned_data['description']
-            course = form.cleaned_data['course']
-            training_type = form.cleaned_data['training_type']
-            quizzes = form.cleaned_data['quiz']
-            assignments = form.cleaned_data['assignment']
-            main_image = form.cleaned_data['main_image']
-            start_at = form.cleaned_data['start_at']
-            end_at = form.cleaned_data['end_at']
-
-            training = Training.objects.create(
-                title=title,
-                description=description,
-                course=course,
-                training_type=training_type,
-                main_image=main_image,
-                start_at=start_at,
-                end_at=end_at,
-                created_by=request.user,
-            )
-
-            training.quiz.add(*quizzes)
-            training.assignment.add(*assignments)
+            form.save()
             return redirect('lms:my_trainings')
-        else:
-            print(form.errors)
-            return render(request, 'lms/create_training.html', {'form': form})
     else:
-        form = TestForm()
-    return render(request, 'lms/create_training.html', {'form': form})
+        form = TrainingForm(instance=training)
+    return render(request, 'lms/update_training.html', {'form': form, 'training': training})
+
+
+@staff_member_required
+@require_http_methods(['DELETE'])
+def delete_training(request, pk):
+    training = get_object_or_404(Training, pk=pk)
+    training.delete()
+    trainings = request.user.training_set.all()
+    return render(request, 'lms/includes/my_training_list_staff.html', {'trainings': trainings})
 
 
 @staff_member_required
@@ -278,21 +304,7 @@ def create_enrollment(request, pk):
     })
 
 
-# @staff_member_required
-# def create_enrollment(request):
-#     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-#
-#     if is_ajax:
-#         if request.method == 'POST':
-#             form = EnrollmentForm(request.POST)
-#             if form.is_valid():
-#                 form.save()
-#                 return JsonResponse({'success': 'successfully enrolled'})
-#             return JsonResponse({'errors': form.errors}, status=400)
-#         return JsonResponse({'status': 'Invalid request bcoz only post is allowed '}, status=400)
-#     return HttpResponseBadRequest('Invalid request (only ajax allowed)')
-
-
+@staff_member_required
 def bulk_add_attendee(request, pk):
     training = get_object_or_404(Training, pk=pk)
     if request.method == 'POST':
@@ -352,22 +364,3 @@ def my_trainings_search_staff(request):
                 )
             data_dict = {"html_from_view": html}
             return JsonResponse(data=data_dict, safe=False)
-
-
-
-
-
-
-
-
-
-
-# def delete_training(request, pk):
-#     training = get_object_or_404(Training, pk=pk)
-#
-
-
-
-
-# class EnrollmentCreateView(CreateView):
-#     model = Enrollment
