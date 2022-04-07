@@ -2,9 +2,9 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-    {% block head %}
-
-    {% endblock %}
+{% block head %}
+        {{ form.media.css }}
+{% endblock %}
 
 {% block content %}
     <div id="layout-wrapper">
@@ -45,5 +45,5 @@
 
 
 {% block scripts %}
-
+    {{ form.media.js }}
 {% endblock %}

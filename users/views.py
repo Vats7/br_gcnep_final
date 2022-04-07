@@ -1,3 +1,4 @@
+import json
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
@@ -5,6 +6,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
+from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -12,13 +14,14 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
-
-from users.forms import LoginForm, SignUpForm, UserProfileForm, UserChangeFormNew, UserCreationFormNew
+from users.forms import LoginForm, SignUpForm, UserProfileForm, \
+    UserChangeFormNew, UserCreationFormNew, ModProfileForm, DocumentForm
 from django.views.decorators.cache import cache_control
 from django.db.models.query_utils import Q
 
-from users.models import UserType
+from users.models import Document
 
 User = get_user_model()
 
@@ -102,28 +105,53 @@ def password_reset_request(request):
                   context={"password_reset_form": password_reset_form})
 
 
-def profile_view(request):
-    if request.method == "POST":
-        form = UserProfileForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile Updated")
-            return redirect("lms:home")
-        messages.error(request, form.errors)
-    form = UserProfileForm()
-    return render(request=request, template_name="users/profile.html", context={"form": form})
-
-# def my_profile(request, id):
-#     user = User.objects.get(pk=unique_id)
+@user_passes_test(lambda u: not u.is_superuser)
+def my_profile_view(request):
+    if request.method == 'POST':
+        if request.user.is_mod:
+            profile = request.user.mod_profile
+            profile_form = ModProfileForm(request.POST, instance=profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                return redirect('users:my_profile')
+            return render(request, 'users/profile.html', {'profile_form': profile_form})
+        else:
+            profile = request.user.profile
+            profile_form = UserProfileForm(request.POST, instance=profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                return redirect('users:my_profile')
+            return render(request, 'users/profile.html', {'profile_form': profile_form})
+    else:
+        if request.user.is_mod:
+            profile = request.user.mod_profile
+            profile_form = ModProfileForm(instance=profile)
+            context = {
+                'profile_form': profile_form
+            }
+        else:
+            profile = request.user.profile
+            profile_form = UserProfileForm(instance=profile)
+            doc_form = DocumentForm()
+            context = {
+                'profile_form': profile_form,
+                'doc_form': doc_form
+            }
+    return render(request, 'users/profile.html', context=context)
 
 
 @method_decorator(staff_member_required, name='dispatch')
 class UserList(ListView):
     model = User
-    template_name = 'users/all_users.html'
+    template_name = 'users/includes/user_list.html'
     context_object_name = 'users'
     paginate_by = 5
     permission_classes = []
+
+    def get_template_names(self):
+        if self.request.htmx:
+            return 'users/includes/user_list.html'
+        return 'users/all_users.html'
 
     def get_queryset(self):
         queryset = User.objects.all()
@@ -133,28 +161,36 @@ class UserList(ListView):
             return queryset.filter(is_staff=False)
 
 
-def user_search(request):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+def htmx_paginate_users(request):
+    users = User.objects.all()
+    paginator = Paginator(users, 5)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'users': users,
+        'page_obj': page_obj,
+    }
+    return render(request, 'users/includes/user_list_loop.html', context=context)
 
-    if is_ajax:
-        if request.method == 'GET':
-            url_parameter = request.GET.get("q")
-            if request.user.is_superuser:
-                users = User.objects.filter(name__icontains=url_parameter, email__icontains=url_parameter)
-                html = render_to_string(
-                    template_name="users/includes/user_list.html",
-                    context={"users": users}
-                )
-                data_dict = {"html_from_view": html}
-                return JsonResponse(data=data_dict, safe=False)
-            else:
-                users = User.objects.filter(name__icontains=url_parameter, email__icontains=url_parameter, is_staff=False)
-                html = render_to_string(
-                    template_name="users/includes/user_list.html",
-                    context={"users": users}
-                )
-                data_dict = {"html_from_view": html}
-                return JsonResponse(data=data_dict, safe=False)
+
+def user_search(request):
+    if request.method == 'GET':
+        url_parameter = request.GET.get("query")
+        if request.user.is_superuser:
+            users = User.objects.filter(
+                Q(name__icontains=url_parameter) | Q(email__icontains=url_parameter))
+
+            context ={
+                'users': users,
+            }
+            return render(request, 'users/includes/search_results.html', context=context)
+        else:
+            users = User.objects.filter(
+                Q(name__icontains=url_parameter) | Q(email__icontains=url_parameter, is_staff=False))
+            context = {
+                'users': users,
+            }
+            return render(request, 'users/includes/search_results.html', context=context)
 
 
 @staff_member_required
@@ -166,7 +202,22 @@ def create_user(request):
             return redirect('users:user_list')
     else:
         form = UserCreationFormNew()
-    return render(request, 'users/create_user.html', {'form': form,})
+    return render(request, 'users/create_user.html', {'form': form})
+
+
+@staff_member_required
+@require_http_methods(['DELETE'])
+def delete_user(request, id):
+    user = get_object_or_404(User, pk=id)
+    user.delete()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "userListChanged": None,
+                "showMessage": f"{user.name} deleted."
+            })
+        })
 
 
 @staff_member_required
@@ -181,3 +232,143 @@ def update_user(request, id):
     else:
         form = UserChangeFormNew(instance=user)
     return render(request, 'users/update_user.html', {'form': form, 'user': user})
+
+
+@user_passes_test(lambda u: not u.is_staff)
+def upload_documents(request):
+    if request.method == "POST":
+        doc_form = DocumentForm(request.POST, request.FILES)
+        if doc_form.is_valid():
+            print('yes')
+            files = request.FILES.getlist('file')
+            print(files)
+            for f in files:
+                Document.objects.create(
+                    user=request.user.profile,
+                    created_by=request.user,
+                    type=doc_form.cleaned_data['type'],
+                    file=f
+                )
+            print('yes-again')
+            return HttpResponse(status=204, headers={
+                'HX-Trigger': json.dumps({
+                    "docsListChanged": None,
+                    "showMessage": 'documents added'
+
+                })
+            })
+    else:
+        doc_form = DocumentForm()
+    return render(request, 'users/document_form.html', {
+        'doc_form': doc_form,
+    })
+
+
+def get_my_documents(request):
+    profile = request.user.profile
+    documents = profile.documents.all()
+    paginator = Paginator(documents, 10)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'user': request.user,
+        'documents': documents,
+        'page_obj': page_obj
+    }
+    if request.htmx:
+        return render(request, 'users/includes/my_documents_list.html', context)
+    return render(request, 'users/my_documents.html', context)
+
+
+def htmx_paginate_my_docs(request):
+    profile = request.user.profile
+    documents = profile.documents.all()
+    paginator = Paginator(documents, 10)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'documents': documents,
+        'page_obj': page_obj,
+    }
+    return render(request, 'users/includes/my_documents_loop.html', context=context)
+
+
+def search_my_documents(request):
+    if request.method == 'GET':
+        url_parameter = request.GET.get("query")
+        documents = request.user.profile.documents.all().filter(type__in=[url_parameter,])
+        # documents = Document.objects.filter(
+        #     Q(type__in=[url_parameter]) #| Q(__icontains=url_parameter)
+        # )
+        context = {
+            'documents': documents
+        }
+        print(documents)
+        return render(request, 'users/includes/my_documents_list.html', context=context)
+
+
+@staff_member_required
+def staff_get_user_documents(request, id):
+    user = User.objects.get(pk=id)
+    documents = user.profile.documents.all()
+    paginator = Paginator(documents, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'user': user,
+        'documents': documents,
+        'page_obj': page_obj
+    }
+    if request.htmx:
+        return render(request, 'users/includes/all_documents_list.html', context)
+    return render(request, 'users/all_documents.html', context)
+
+
+def htmx_paginate_user_docs(request, id):
+    user = User.objects.get(pk=id)
+    documents = user.profile.documents.all()
+    paginator = Paginator(documents, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'user': user,
+        'documents': documents,
+        'page_obj': page_obj
+    }
+    return render(request, 'users/includes/all_documents_loop.html', context=context)
+
+
+@staff_member_required
+def user_profile_view(request, id):
+    user = User.objects.get(pk=id)
+    if request.method == 'POST':
+        if user.is_mod:
+            profile = user.mod_profile
+            form = ModProfileForm(request.POST, instance=profile)
+            if form.is_valid():
+                form.save()
+                return redirect('users:all_users_list')
+            return render(request, 'users/user_profile.html', {'form': form})
+        else:
+            profile = user.profile
+            form = UserProfileForm(request.POST, instance=profile)
+            if form.is_valid():
+                form.save()
+                return redirect('users:all_users_list')
+            return render(request, 'users/user_profile.html', {'form': form})
+    else:
+        if user.is_mod:
+            profile = user.mod_profile
+            form = ModProfileForm(instance=profile)
+            context = {
+                'profile_form': form
+            }
+        else:
+            profile = user.profile
+            form = UserProfileForm(instance=profile)
+            doc_form = DocumentForm()
+            context = {
+                'profile_form': form,
+            }
+    return render(request, 'users/user_profile.html', {'form': form})
+

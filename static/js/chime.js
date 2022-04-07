@@ -1,8 +1,8 @@
 console.log('chime')
 
 
-const meetingUrl = window.location.href + "get_meeting"
-const attendeeUrl = window.location.href + "get_attendee"
+const meetingUrl = window.location.href + "/" + "get_meeting"
+const attendeeUrl = window.location.href + "/" + "get_attendee"
 
 
 async function ajaxGetMeeting() {

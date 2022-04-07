@@ -175,8 +175,10 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <!-- item-->
-                    <a class="dropdown-item" href="{% url 'users:profile' %}"><i
-                            class="mdi mdi-account-circle font-size-17 align-middle me-1"></i> Profile</a>
+                    {% if not request.user.is_superuser %}
+                        <a class="dropdown-item" href="{% url 'users:my_profile' %}"><i
+                                class="mdi mdi-account-circle font-size-17 align-middle me-1"></i> Profile</a>
+                    {% endif %}
                     <a class="dropdown-item d-flex align-items-center" href="#"><i
                             class="mdi mdi-cog font-size-17 align-middle me-1"></i> Settings</a>
                     <div class="dropdown-divider"></div>

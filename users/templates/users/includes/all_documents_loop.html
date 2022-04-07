@@ -1,0 +1,30 @@
+{% for d in page_obj %}
+    <tr hx-target="this" hx-swap="outerHTML">
+        <td>{{ d.type }}</td>
+        <th>{{ d.created_at }}</th>
+        <td><a href="{{ d.file.url }}">view</a></td>
+{#        <td>#}
+{#            <a hx-delete="{% url 'cms:delete_assignment' a.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit">#}
+{#                <i class="fas fa-trash"></i>#}
+{#            </a>#}
+{#            <a href="{% url 'cms:update_assignment' a.unique_id %}"#}
+{#                   class="btn btn-info btn-sm edit">#}
+{#                    <i class="fas fa-edit"></i>#}
+{#            </a>#}
+{#        </td>#}
+    </tr>
+{% endfor %}
+
+
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'users:htmx_paginate_user_docs' user.id %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}

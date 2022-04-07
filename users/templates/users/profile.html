@@ -10,24 +10,39 @@
         <div class="main-content indpages">
             <div class="page-content">
                 <div class="container-fluid">
-
                     <!-- start page title -->
                     <div class="page-title-box">
                         <div class="row align-items-center">
                             <div class="col-md-8">
-                                <h6 class="page-title">{{ request.user.name }} PROFILE</h6>
+                                {% if request.user.is_staff %}
+                                    <h6 class="page-title">Moderator Profile</h6>
+                                {% else %}
+                                    <h6 class="page-title">User Profile</h6>
+                                {% endif %}
+                                <h4 class="page-title">Name:  {{ request.user.name }}</h4>
                             </div>
                         </div>
                     </div>
+                    {% if not request.user.is_staff %}
+                        <div class="col mb-3">
+                            <button class="btn btn-primary">Add Employment</button>
+                            <button class="btn btn-primary">Add Education</button>
+{#                        <button hx-get="{% url 'users:upload_documents' %}" hx-target="#dialog">#}
+{#                            Add Documents#}
+{#                        </button>#}
+                            <a href="{% url 'users:get_my_documents' %}">
+                                <button class="btn btn-primary">My Documents</button>
+                            </a>
+                        </div>
+                    {% endif %}
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="card">
                                 <div class="card-body">
-
                                     <form id="profile-form" method="POST">
                                         {% csrf_token %}
-                                        {{ form|crispy }}
-                                        <button type="submit" class="btn btn-primary mt-3">Save</button>
+                                        {{ profile_form|crispy }}
+                                        <button type="submit" class="btn btn-primary mt-3">Update</button>
                                     </form>
                                 </div>
                             </div>
@@ -38,4 +53,8 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'users/js/users.js' %}" defer></script>
 {% endblock %}

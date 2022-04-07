@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserCreationForm
 from django.core.exceptions import ValidationError
-from users.models import CustomUser, UserProfile, UserType
-
+from users.models import CustomUser, UserProfile, UserType, ModeratorProfile, Document
 
 User = get_user_model()
 
@@ -81,9 +80,6 @@ class UserChangeFormNew(forms.ModelForm):
             del self.fields['types']
 
 
-
-
-
 class LoginForm(forms.Form):
     """user login form"""
     email = forms.EmailField()
@@ -96,9 +92,11 @@ class UserProfileForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'gender', 'dob', 'pob', 'org_ins',
                   'ofc_add', 'ofc_number', 'nationality', 'fax', 'secondary_email']
 
-        # widgets = {
-        #     'course':
-        # }
+
+class ModProfileForm(forms.ModelForm):
+    class Meta:
+        model = ModeratorProfile
+        fields = '__all__'
 
 
 class SignUpForm(UserCreationForm):
@@ -121,6 +119,32 @@ class SignUpForm(UserCreationForm):
         return u_types
 
 
+# class DocumentForm(forms.ModelForm):
+#     class Meta:
+#         model = Document
+#         fields = ['type', 'file']
+#         widgets = {
+#             'file': forms.ClearableFileInput(attrs={'multiple': True}),
+#             'type': forms.Select(attrs={'class': 'form-select', })
+#         }
 
 
+class DocumentForm(forms.Form):
+    Types = [
+        ('SIGNATURE', 'Signature'),
+        ('PASSPORT', 'Passport'),
+        ('VISA', 'Visa'),
+        ('APPROVAL', 'Approval'),
+        ('AV', 'AudioVideo'),
+    ]
 
+    type = forms.ChoiceField(choices=Types, widget=forms.Select(attrs={'class': 'form-select', }))
+    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    #file = forms.FileField()
+    
+    # def clean_file(self):
+    #     files = self.request.FILES.getlist('file')
+    #     print(len(files))
+    #     if len(files) > 3:
+    #         raise ValidationError('More than 3')
+    #     return files

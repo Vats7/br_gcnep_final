@@ -1,3 +1,5 @@
+{% load custom_tags %}
+
 {% if assignments %}
 <div class="row">
     <div class="col-lg-12">
@@ -8,20 +10,18 @@
                         <div class="table-responsive">
                             <table class="table text-center mb-20">
                                 <thead>
-
                                 <tr>
                                     <th>Title</th>
                                     <th>Description</th>
+                                    <th>Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for a in assignments %}
-
-                                    <tr>
-                                        <td>{{ a.title }}</td>
-                                        <td>{{ a.description }}</td>
-                                    </tr>
-                                {% endfor %}
+                                {% if request.user|has_type:"TRAINER" or request.user.is_staff %}
+                                    {% include 'cms/includes/assignments_loop.html' %}
+                                {% else %}
+                                    {% include 'cms/includes/my_assignments_loop.html' %}
+                                {% endif %}
                                 </tbody>
                             </table>
                         </div>

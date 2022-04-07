@@ -25,6 +25,7 @@
     <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.7.0"></script>
     {% block head %}
     {% endblock %}
 </head>
@@ -46,9 +47,13 @@
 <script src="{% static 'libs/metismenu/metisMenu.min.js' %}"></script>
 <script src="{% static 'libs/simplebar/simplebar.min.js' %}"></script>
 <script src="{% static 'libs/node-waves/waves.min.js' %}"></script>
+<script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        })
+</script>
 
 
-<script src="https://unpkg.com/htmx.org@1.7.0"></script>
 <!-- Peity chart-->
 <script src="{% static 'libs/peity/jquery.peity.min.js' %}"></script>
 

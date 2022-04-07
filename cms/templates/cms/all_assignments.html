@@ -2,10 +2,11 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block head %}
+
+{% endblock %}
 
 {% block content %}
-
-
     <div id="layout-wrapper">
         {% include 'lms/includes/top_menu.html' %}
         {% include 'lms/includes/sidebar.html' %}
@@ -14,6 +15,14 @@
                 <div class="container-fluid">
                     <div class="page-title-box">
                         <div class="row align-items-center">
+                            <div class="toast-container position-fixed top-0 end-0 p-3">
+                              <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="d-flex">
+                                  <div id="toast-body" class="toast-body"></div>
+                                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                              </div>
+                            </div>
                             <div class="col-md-8">
                                 {% if not request.user.is_staff %}
                                     <h6 class="page-title">ALL Assignments created by {{ request.user.name }}</h6>
@@ -38,7 +47,15 @@
                                                 <div class="mb-3 col-lg-3">
                                                     <label class="form-label" for="query">Search...</label>
                                                     <i id="search-icon" class="fas fa-search"></i>
-                                                    <input type="text" id="user-input" class="form-control"/>
+                                                    <input type="text" class="form-control"
+                                                           hx-get="{% url 'cms:all_assignments_search' %}"
+                                                           hx-target="#search-results"
+                                                           hx-trigger="keyup changed delay:500ms"
+                                                           hx-swap="innerHTML"
+                                                           hx-indicator="#spinner"
+                                                           name="query"
+                                                    />
+
                                                 </div>
                                             </div>
                                         </div>
@@ -47,17 +64,19 @@
                             </div>
                         </div>
                     </div>
+                    <!-- end search -->
                     <div>
-                        <button type="button" class="btn btn-info mb-2" data-bs-toggle="modal"
-                                data-bs-target="#addAssignmentModal">
-                           Add Assignment
+                        <button hx-get="{% url 'cms:create_assignment' %}"
+                                hx-target="#dialog" class="btn btn-info mb-2">
+                            Create Assignment
                         </button>
                     </div>
-                    <!-- end search -->
-                    <div id="search-results">
-                        {% include 'cms/includes/all_assignments_list.html' %}
+                    <div id="search-results"
+                         hx-trigger="load, assignmentListChanged from:body"
+                         hx-get="{% url 'cms:all_assignments_list' %}"
+                         hx-target="this">
                     </div>
-                </div> <!-- container-fluid -->
+                </div>
             </div>
             <!-- End Page-content -->
             <footer class="footer">
@@ -73,27 +92,33 @@
             </footer>
         </div>
     </div>
-    <div class="modal fade" id="addAssignmentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Create Assignment</h5>
-                    <button type="button" class="btn-close add-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div id="addAssignmentModal" class="modal fade">
+        <div id="dialog" class="modal-dialog" hx-target="this">
+
+        </div>
+    </div>
+    <div id="updateAssignmentModal" class="modal fade">
+        <div id="update-dialog" class="modal-dialog" hx-target="this">
+
+        </div>
+    </div>
+    <div class="top-0 start-50 translate-middle-x">
+        <div id="toast" class="toast align-items-center text-black-50 bg-success border-0" role="alert"
+             aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div id="toast-body" class="toast-body">
+
                 </div>
-                <div class="modal-body">
-                    <form id="post-form" autocomplete="off" method="post" action="{% url 'cms:create_assignment' %}">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger add-modal-close" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="add-btn" class="btn btn-success">Add</button>
-                        </div>
-                    </form>
-                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
     </div>
-    <script src="{% static 'lms/js/all_assignments.js' %}" defer></script>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'cms/js/assignments.js' %}" defer></script>
 {% endblock %}
 
 

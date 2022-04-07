@@ -32,7 +32,13 @@
                                                 <div class="mb-3 col-lg-3">
                                                     <label class="form-label" for="query">Search...</label>
                                                     <i id="search-icon" class="fas fa-search"></i>
-                                                    <input type="text" id="user-input" class="form-control"/>
+                                                    <input type="text" class="form-control"
+                                                           hx-get="{% url 'cms:my_quizzes_search' %}"
+                                                           hx-target="#search-results"
+                                                           hx-trigger="keyup changed delay:500ms"
+                                                           hx-swap="innerHTML"
+                                                           name="query"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -42,8 +48,11 @@
                         </div>
                     </div>
                     <!-- end search -->
-                    <div id="search-results">
-                        {% include 'cms/includes/all_quizzes_list.html' %}
+                    <div id="search-results"
+                         hx-trigger="load"
+                         hx-get="{% url 'cms:my_quizzes_list' %}"
+                         hx-target="this">
+
                     </div>
                 </div> <!-- container-fluid -->
             </div>
@@ -61,7 +70,7 @@
             </footer>
         </div>
     </div>
-    <script src="{% static 'lms/js/all_assignments.js' %}" defer></script>
+
 {% endblock %}
 
 

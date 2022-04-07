@@ -32,14 +32,20 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Search by</h4>
-                                    {#                                        <form class="repeater" enctype="multipart/form-data">#}
                                     <form id="search-form" class="repeater">
                                         <div data-repeater-list="group-a">
                                             <div data-repeater-item class="row">
                                                 <div class="mb-3 col-lg-3">
                                                     <label class="form-label" for="query">Search...</label>
                                                     <i id="search-icon" class="fas fa-search"></i>
-                                                    <input type="text" id="user-input" class="form-control"/>
+{#                                                    <input type="text" id="user-input" class="form-control"/>#}
+                                                    <input type="text" class="form-control"
+                                                           hx-get="{% url 'lms:my_trainings_search' %}"
+                                                           hx-target="#search-results"
+                                                           hx-trigger="keyup changed delay:500ms"
+                                                           hx-swap="innerHTML"
+                                                           name="query"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>

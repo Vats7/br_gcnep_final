@@ -1,0 +1,25 @@
+{% for q in page_obj %}
+<tr hx-target="this" hx-swap="outerHTML">
+    <td>{{ q.category }}</td>
+    <td>{{ q.title }}</td>
+    <td>{{ q.description }}</td>
+    <td>{{ q.status }}</td>
+    <td>{{ q.difficulty }}</td>
+    <td>{{ q.total_questions }}</td>
+    <td>View</td>
+</tr>
+{% endfor %}
+
+
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'cms:htmx_paginate_my_quizzes' %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}

@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'corsheaders',
     'django_select2',
+    'import_export',
+    'django_htmx',
 
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -50,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    "django_htmx.middleware.HtmxMiddleware",
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -191,3 +194,7 @@ CACHES = {
 
 # Tell select2 which cache configuration to use:
 SELECT2_CACHE_BACKEND = "select2"
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+#APPEND_SLASH = False
+#DATA_UPLOAD_MAX_NUMBER_FIELDS = 50000

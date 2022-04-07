@@ -161,14 +161,14 @@ class Enrollment(BaseModel):
         user_types = self.user.types.all()
         if trainer not in user_types:
             if self.permission in ['PRIMARY', 'OTHER']:
-                raise ValidationError('Selected User does not have required permission')
+                raise ValidationError('Selected User does not have required User Types')
 
         if trainee not in user_types:
             if self.permission == 'TRAINEE':
-                raise ValidationError('Selected User does not have required permission')
+                raise ValidationError('Selected User does not have required User Types')
 
         if observer not in user_types:
             if self.permission == 'OBSERVER':
-                raise ValidationError('Selected User does not have required permission')
+                raise ValidationError('Selected User does not have required User Types')
 
 

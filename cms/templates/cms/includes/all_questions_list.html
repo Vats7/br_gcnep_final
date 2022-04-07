@@ -8,19 +8,14 @@
                         <div class="table-responsive">
                             <table class="table text-center mb-20">
                                 <thead>
-
                                 <tr>
                                     <th>Question</th>
                                     <th>Marks</th>
+                                    <th>Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for q in questions %}
-                                    <tr>
-                                        <td>{{ q.question }}</td>
-                                        <td>{{ q.marks }}</td>
-                                    </tr>
-                                {% endfor %}
+                                {% include 'cms/includes/questions_loop.html' %}
                                 </tbody>
                             </table>
                         </div>

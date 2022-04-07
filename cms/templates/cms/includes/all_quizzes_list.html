@@ -1,3 +1,6 @@
+{% load custom_tags %}
+
+
 {% if quizzes %}
 <div class="row">
     <div class="col-lg-12">
@@ -15,19 +18,15 @@
                                     <th>Status</th>
                                     <th>Difficulty</th>
                                     <th>Questions</th>
+                                    <th>Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for q in quizzes %}
-                                    <tr>
-                                        <td>{{ q.category }}</td>
-                                        <td>{{ q.title }}</td>
-                                        <td>{{ q.description }}</td>
-                                        <td>{{ q.status }}</td>
-                                        <td>{{ q.difficulty }}</td>
-                                        <td>{{ q.total_questions }}</td>
-                                    </tr>
-                                {% endfor %}
+                                {% if request.user|has_type:"TRAINER" or request.user.is_staff %}
+                                    {% include 'cms/includes/quizzes_loop.html' %}
+                                {% else %}
+                                    {% include 'cms/includes/my_quizzes_loop.html' %}
+                                {% endif %}
                                 </tbody>
                             </table>
                         </div>

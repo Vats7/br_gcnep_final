@@ -3,40 +3,45 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 from django.utils.html import format_html
 from .forms import UserAdminCreationForm, UserChangeForm
-from .models import CustomUser, UserProfile, ModeratorProfile, UserType, Document, Education, Employment
+from .models import CustomUser, UserProfile, ModeratorProfile, UserType, Document#Document, Education, Employment
 
 
-class DocumentInlineAdmin(admin.StackedInline):
-    model = Document
-    extra = 0
-    readonly_fields = ('sig_tag', 'pass_1_tag', 'pass_2_tag', 'unique_id', 'created_by', 'created_at', 'updated_at')
-    classes = ['collapse']
-
-    @admin.display(description='Signature')
-    def sig_tag(self, obj):
-        return format_html('<img src="{0}" style="width: 100px; height:100px;" />'.format(obj.sig_1.url))
-
-    @admin.display(description='Passport Front')
-    def pass_1_tag(self, obj):
-        return format_html('<img src="{0}" style="width: 100px; height:100px;" />'.format(obj.pass_1.url))
-
-    @admin.display(description='Passport Back')
-    def pass_2_tag(self, obj):
-        return format_html('<img src="{0}" style="width: 100px; height:100px;" />'.format(obj.pass_2.url))
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'type']
 
 
-class EducationInlineAdmin(admin.StackedInline):
-    model = Education
-    extra = 0
-    readonly_fields = ('unique_id', 'created_by', 'created_at', 'updated_at')
-    classes = ['collapse']
+# class DocumentInlineAdmin(admin.StackedInline):
+#     model = Document
+#     extra = 0
+#     readonly_fields = ('sig_tag', 'pass_1_tag', 'pass_2_tag', 'unique_id', 'created_by', 'created_at', 'updated_at')
+#     classes = ['collapse']
+#
+#     @admin.display(description='Signature')
+#     def sig_tag(self, obj):
+#         return format_html('<img src="{0}" style="width: 100px; height:100px;" />'.format(obj.sig_1.url))
+#
+#     @admin.display(description='Passport Front')
+#     def pass_1_tag(self, obj):
+#         return format_html('<img src="{0}" style="width: 100px; height:100px;" />'.format(obj.pass_1.url))
+#
+#     @admin.display(description='Passport Back')
+#     def pass_2_tag(self, obj):
+#         return format_html('<img src="{0}" style="width: 100px; height:100px;" />'.format(obj.pass_2.url))
 
 
-class EmploymentInlineAdmin(admin.StackedInline):
-    model = Employment
-    extra = 0
-    readonly_fields = ('unique_id', 'created_by', 'created_at', 'updated_at')
-    classes = ['collapse']
+# class EducationInlineAdmin(admin.StackedInline):
+#     model = Education
+#     extra = 0
+#     readonly_fields = ('unique_id', 'created_by', 'created_at', 'updated_at')
+#     classes = ['collapse']
+#
+#
+# class EmploymentInlineAdmin(admin.StackedInline):
+#     model = Employment
+#     extra = 0
+#     readonly_fields = ('unique_id', 'created_by', 'created_at', 'updated_at')
+#     classes = ['collapse']
 
 
 @admin.register(CustomUser)
@@ -59,7 +64,7 @@ class CustomUserAdmin(BaseUserAdmin):
     ordering = ('email',)
     readonly_fields = ('date_joined', 'last_login',)#'types'
     filter_horizontal = ('types',)
-    inlines = []
+    #inlines = []
     actions = ['activate_users', 'assign_trainees']
 
     @admin.display(description='Types')
@@ -152,7 +157,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             'fields': (('ofc_add', 'ofc_number',), ('nationality', 'fax', 'secondary_email')),
          }),
     )
-    inlines = [DocumentInlineAdmin, EducationInlineAdmin, EmploymentInlineAdmin]#EnrollmentInline
+    #inlines = [DocumentInlineAdmin, EducationInlineAdmin, EmploymentInlineAdmin]#EnrollmentInline
 
     @admin.display(description='Name')
     def get_name(self, obj):

@@ -31,7 +31,13 @@
                                                 <div class="mb-3 col-lg-3">
                                                     <label class="form-label" for="query">Search...</label>
                                                     <i id="search-icon" class="fas fa-search"></i>
-                                                    <input type="text" id="user-input" class="form-control"/>
+                                                    <input type="text" class="form-control"
+                                                           hx-get="{% url 'users:user_search' %}"
+                                                           hx-target="#search-results"
+                                                           hx-trigger="keyup changed delay:500ms"
+                                                           hx-swap="innerHTML"
+                                                           name="query"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -41,8 +47,10 @@
                         </div>
                     </div>
                     <!-- end search -->
-                    <div id="search-results">
-                        {% include 'users/includes/user_list.html' %}
+                    <div id="search-results"
+                         hx-trigger="load, userListChanged from:body"
+                         hx-get="{% url 'users:all_users_list' %}"
+                         hx-target="this">
                     </div>
                 </div>
             </div>
@@ -79,9 +87,12 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'users/js/users.js' %}" defer></script>
+
 {% endblock %}
 
+{% block scripts %}
+    <script src="{% static 'users/js/users.js' %}"></script>
+{% endblock %}
 
 
 

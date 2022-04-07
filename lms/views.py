@@ -1,4 +1,3 @@
-from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -6,16 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template.loader import render_to_string
-from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
+from django.views.generic import ListView
+
 from lms.models import Training, Enrollment
 import boto3
 from django.contrib.auth.decorators import user_passes_test
-
-from users.models import UserType
 from .forms import EnrollmentForm, BulkAddAttendeeForm, TrainingForm
-
 
 client = boto3.client(
     'chime-sdk-meetings',
@@ -32,20 +29,40 @@ def index(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def all_trainings(request):
-    trainings = Training.objects.all()
-    context = {
-        'trainings': trainings
-    }
-    return render(request, 'lms/all_trainings.html', context=context)
+    return render(request, 'lms/all_trainings.html')
 
 
-def my_training_list(request):
+# @user_passes_test(lambda u: u.is_superuser)
+# def all_trainings_list(request):
+#     trainings = Training.objects.all()
+#     context = {
+#         'trainings': trainings
+#     }
+#     return render(request, 'lms/includes/all_trainings_list.html', context=context)
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AllTrainingsList(ListView):
+    model = Training
+    template_name = 'lms/includes/all_trainings_list.html'
+    context_object_name = 'trainings'
+    paginate_by = 5
+    queryset = Training.objects.all()
+
+
+def my_trainings(request):
+    if request.user.is_staff:
+        return render(request, 'lms/training_list_staff.html')
+    return render(request, 'lms/training_list_user.html')
+
+
+def my_trainings_list(request):
     trainings = request.user.training_set.all()
     if request.user.is_staff:
-        return render(request, 'lms/training_list_staff.html', {
+        return render(request, 'lms/includes/my_training_list_staff.html', {
             'trainings': trainings,
         })
-    return render(request, 'lms/training_list_user.html', {
+    return render(request, 'lms/includes/my_training_list_user.html', {
         'trainings': trainings,
     })
 
@@ -62,25 +79,9 @@ def training_detail(request, pk):
 
 
 @login_required
-def join_meeting(request,pk):
-    return render(request, 'lms/chime.html')
-
-
-@login_required
-def redirect_meeting(request, pk):
-    base_url = reverse('lms:chime')
+def join_meeting(request, pk):
     training = get_object_or_404(Training, pk=pk)
-    # e = get_object_or_404(Enrollment, user=request.user.profile, training=training)
-
-    query_string = urlencode(
-        {
-            'user_id': request.user.id,
-            'user_name': request.user.name,
-            'meet_id': training.unique_id,
-        }
-    )
-    url = '{}?{}'.format(base_url, query_string)  # 3 /products/?category=42
-    return redirect(url)
+    return render(request, 'lms/chime.html', {'training': training})
 
 
 def get_meeting(request, pk):
@@ -165,83 +166,6 @@ def start_meeting(request, pk):
     return redirect('lms:my_trainings')
 
 
-# @staff_member_required
-# def create_training(request):
-#     if request.method == 'POST':
-#         form = TestForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             title = form.cleaned_data['title']
-#             description = form.cleaned_data['description']
-#             course = form.cleaned_data['course']
-#             training_type = form.cleaned_data['training_type']
-#             quizzes = form.cleaned_data['quiz']
-#             assignments = form.cleaned_data['assignment']
-#             main_image = form.cleaned_data['main_image']
-#             start_at = form.cleaned_data['start_at']
-#             end_at = form.cleaned_data['end_at']
-# 
-#             training = Training.objects.create(
-#                 title=title,
-#                 description=description,
-#                 course=course,
-#                 training_type=training_type,
-#                 main_image=main_image,
-#                 start_at=start_at,
-#                 end_at=end_at,
-#                 created_by=request.user,
-#             )
-# 
-#             training.quiz.add(*quizzes)
-#             training.assignment.add(*assignments)
-#             return redirect('lms:my_trainings')
-#         else:
-#             print(form.errors)
-#             return render(request, 'lms/create_training.html', {'form': form})
-#     else:
-#         form = TestForm()
-#     return render(request, 'lms/create_training.html', {'form': form})
-
-# @require_http_methods(['POST'])
-# def start_meeting(request, pk):
-#     training = get_object_or_404(Training, pk=pk)
-#     attendees_ids = [u.unique_id for u in training.attendees.all()]
-#     attendees = []
-#     for i in attendees_ids:
-#         attendees.append({
-#             'ExternalUserId': str(i)
-#         })
-#
-#     res = client.create_meeting_with_attendees(
-#         MediaRegion='ap-south-1',
-#         ExternalMeetingId=str(training.unique_id),
-#         MeetingFeatures={
-#             'Audio': {
-#                 'EchoReduction': 'AVAILABLE'
-#             }
-#         },
-#         Attendees=attendees
-#     )
-#
-#     training.chime_id = res['Meeting']['MeetingId']
-#     training.save()
-#
-#     id_list = [i['ExternalUserId'] for i in res['Attendees']]
-#
-#     info_list = [{k: v for k, v in d.items() if k != 'ExternalUserId'} for d in res['Attendees']]
-#
-#     req_dict = dict(zip(id_list, info_list))
-#
-#     with transaction.atomic():
-#         for key, value in req_dict.items():
-#             Enrollment.objects.filter(
-#                 user__unique_id=key
-#             ).update(
-#                 join_token=value['JoinToken'],
-#                 attendee_id=value['AttendeeId']
-#             )
-#     return HttpResponse()
-
-
 @staff_member_required
 def create_training(request):
     if request.method == 'POST':
@@ -276,8 +200,7 @@ def update_training(request, pk):
 def delete_training(request, pk):
     training = get_object_or_404(Training, pk=pk)
     training.delete()
-    trainings = request.user.training_set.all()
-    return render(request, 'lms/includes/my_training_list_staff.html', {'trainings': trainings})
+    return HttpResponse('')
 
 
 @staff_member_required
@@ -329,38 +252,27 @@ def bulk_add_attendee(request, pk):
 
 
 def all_trainings_search(request):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-
-    if is_ajax:
-        if request.method == 'GET':
-            url_parameter = request.GET.get("q")
-            trainings = Training.objects.filter(title__icontains=url_parameter, description__icontains=url_parameter)
-            html = render_to_string(
-                template_name="lms/includes/all_trainings_list.html",
-                context={"trainings": trainings}
-            )
-            data_dict = {"html_from_view": html}
-            return JsonResponse(data=data_dict, safe=False)
+    if request.method == 'GET':
+        url_parameter = request.GET.get("query")
+        trainings = Training.objects.filter(title__icontains=url_parameter, description__icontains=url_parameter)
+        context = {
+            'trainings': trainings
+        }
+        return render(request, 'lms/includes/all_trainings_list.html', context=context)
 
 
-def my_trainings_search_staff(request):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+def my_trainings_search(request):
+    if request.method == 'GET':
+        url_parameter = request.GET.get("query")
+        trainings = request.user.training_set.all().\
+            filter(title__icontains=url_parameter, description__icontains=url_parameter)
 
-    if is_ajax:
-        if request.method == 'GET':
-            url_parameter = request.GET.get("q")
-            trainings = request.user.training_set.all().\
-                filter(title__icontains=url_parameter, description__icontains=url_parameter)
+        context = {
+            'trainings': trainings
+        }
+        if request.user.is_staff:
+            return render(request, 'lms/includes/search_results_staff.html', context=context)
+        else:
+            return render(request, 'lms/includes/search_results_user.html', context=context)
+    return HttpResponseBadRequest('Invalid request (only GET allowed)')
 
-            if request.user.is_staff:
-                html = render_to_string(
-                    template_name="lms/includes/my_training_list_staff.html",
-                    context={"trainings": trainings}
-                )
-            else:
-                html = render_to_string(
-                    template_name="lms/includes/my_training_list_user.html",
-                    context={"trainings": trainings}
-                )
-            data_dict = {"html_from_view": html}
-            return JsonResponse(data=data_dict, safe=False)

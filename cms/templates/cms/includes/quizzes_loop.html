@@ -1,0 +1,35 @@
+{% for q in page_obj %}
+<tr hx-target="this" hx-swap="outerHTML">
+    <td>{{ q.category }}</td>
+    <td>{{ q.title }}</td>
+    <td>{{ q.description }}</td>
+    <td>{{ q.status }}</td>
+    <td>{{ q.difficulty }}</td>
+    <td>{{ q.total_questions }}</td>
+    {% if request.user.is_staff %}
+        <td>
+            <a hx-delete="{% url 'cms:delete_quiz' q.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit"> <i class="fas fa-trash"></i></a>
+            <a href="{% url 'cms:update_quiz' q.unique_id %}"
+                   class="btn btn-info btn-sm edit">
+                    <i class="fas fa-edit"></i>
+            </a>
+        </td>
+    {% else %}
+        <td>View</td>
+    {% endif %}
+</tr>
+{% endfor %}
+
+
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'cms:htmx_paginate_quizzes' %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}

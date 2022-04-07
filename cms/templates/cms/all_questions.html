@@ -3,8 +3,6 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
-
     <div id="layout-wrapper">
         {% include 'lms/includes/top_menu.html' %}
         {% include 'lms/includes/sidebar.html' %}
@@ -37,7 +35,13 @@
                                                 <div class="mb-3 col-lg-3">
                                                     <label class="form-label" for="query">Search...</label>
                                                     <i id="search-icon" class="fas fa-search"></i>
-                                                    <input type="text" id="user-input" class="form-control"/>
+                                                    <input type="text" class="form-control"
+                                                           hx-get="{% url 'cms:search_all_questions' %}"
+                                                           hx-target="#search-results"
+                                                           hx-trigger="keyup changed delay:500ms"
+                                                           hx-swap="innerHTML"
+                                                           name="query"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -47,20 +51,22 @@
                         </div>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-info mb-2" data-bs-toggle="modal"
-                                data-bs-target="#addQuestionModal">
-                           Add Question
+                        <button hx-get="{% url 'cms:create_question' %}"
+                                hx-target="#dialog" class="btn btn-info mb-2">
+                            Add a Question
+                        </button>
+                        <button hx-get="{% url 'cms:upload_questions' %}"
+                                hx-target="#dialogBulk" class="btn btn-info mb-2">
+                            Bulk Upload
                         </button>
                     </div>
                     <!-- end search -->
-                    <div id="search-results">
-                        {% include 'cms/includes/all_questions_list.html' %}
+                    <div id="search-results"
+                         hx-trigger="load, questionListChanged from:body"
+                         hx-get="{% url 'cms:all_questions_list' %}"
+                         hx-target="this">
+
                     </div>
-{#                    <div>#}
-{#                        <a href="{% url 'cms:create_question' %}">#}
-{#                            <button class="btn btn-primary">Create</button>#}
-{#                        </a>#}
-{#                    </div>#}
                 </div> <!-- container-fluid -->
             </div>
             <!-- End Page-content -->
@@ -77,29 +83,23 @@
             </footer>
         </div>
     </div>
-    <div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Create Question</h5>
-                    <button type="button" class="btn-close add-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="post-form" autocomplete="off" method="post" action="{% url 'cms:create_question' %}">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger add-modal-close" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="add-btn" class="btn btn-success">Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div id="addQuestionModal" class="modal fade">
+        <div id="dialog" class="modal-dialog" hx-target="this">
+
         </div>
     </div>
-    <script src="{% static 'lms/js/all_assignments.js' %}" defer></script>
+    <div id="addBulkQuestionModal" class="modal fade">
+        <div id="dialogBulk" class="modal-dialog" hx-target="this">
+
+        </div>
+    </div>
+
 {% endblock %}
 
+{% block scripts %}
+
+    <script src="{% static 'cms/js/questions.js' %}" defer></script>
+{% endblock %}
 
 
 
