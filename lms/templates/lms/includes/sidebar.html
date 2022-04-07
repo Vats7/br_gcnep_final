@@ -76,9 +76,9 @@
                             <i class="mdi mdi-cog font-size-17 align-middle me-1"></i>
                             <span>Setting</span>
                         </a>
-                        <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="">Change password</a></li>
-                        </ul>
+{#                        <ul class="sub-menu" aria-expanded="false">#}
+{#                            <li><a href="">Change password</a></li>#}
+{#                        </ul>#}
                     </li>
                 {% else %}
                     <li>
@@ -139,12 +139,15 @@
                         </ul>
                     </li>
                     <!--Roles-->
-                    <li>
-                        <a href="" class="waves-effect">
-                            <i class="ti-infinite"></i>
-                            <span>Roles & Rights Management</span>
-                        </a>
-                    </li>
+{#                    <li>#}
+{#                        <a href="javascript: void(0);" class="has-arrow waves-effect">#}
+{#                            <i class="ti-book"></i>#}
+{#                            <span>Document Management</span>#}
+{#                        </a>#}
+{#                        <ul class="sub-menu" aria-expanded="false">#}
+{#                            <li><a href="{% url 'users:all_documents' %}">All Documents</a></li>#}
+{#                        </ul>#}
+{#                    </li>#}
                     <!--Backup-->
                     <li>
                         <a href="#" class="waves-effect">
@@ -165,9 +168,9 @@
                             <i class="mdi mdi-cog font-size-17 align-middle me-1"></i>
                             <span>Setting</span>
                         </a>
-                        <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="">Change password</a></li>
-                        </ul>
+{#                        <ul class="sub-menu" aria-expanded="false">#}
+{#                            <li><a href="">Change password</a></li>#}
+{#                        </ul>#}
                     </li>
                 {% endif %}
 

@@ -13,6 +13,9 @@ urlpatterns = [
     path("user_profile_view/<int:id>/", views.user_profile_view, name="user_profile_view"),
 
 
+    path("users/all_documents", views.all_documents, name="all_documents"),
+    path("users/htmx_paginate_all_docs", views.htmx_paginate_all_docs, name="htmx_paginate_all_docs"),
+
     path("users/upload_documents/", views.upload_documents, name="upload_documents"),
     path("users/get_my_documents", views.get_my_documents, name="get_my_documents"),
     path("users/htmx_paginate_my_docs", views.htmx_paginate_my_docs, name="htmx_paginate_my_docs"),

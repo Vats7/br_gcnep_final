@@ -320,8 +320,8 @@ def staff_get_user_documents(request, id):
         'page_obj': page_obj
     }
     if request.htmx:
-        return render(request, 'users/includes/all_documents_list.html', context)
-    return render(request, 'users/all_documents.html', context)
+        return render(request, 'users/includes/user_documents_list.html', context)
+    return render(request, 'users/user_documents.html', context)
 
 
 def htmx_paginate_user_docs(request, id):
@@ -335,7 +335,7 @@ def htmx_paginate_user_docs(request, id):
         'documents': documents,
         'page_obj': page_obj
     }
-    return render(request, 'users/includes/all_documents_loop.html', context=context)
+    return render(request, 'users/includes/user_documents_loop.html', context=context)
 
 
 @staff_member_required
@@ -361,14 +361,72 @@ def user_profile_view(request, id):
             profile = user.mod_profile
             form = ModProfileForm(instance=profile)
             context = {
-                'profile_form': form
+                'form': form
             }
         else:
             profile = user.profile
             form = UserProfileForm(instance=profile)
-            doc_form = DocumentForm()
             context = {
-                'profile_form': form,
+                'form': form,
             }
-    return render(request, 'users/user_profile.html', {'form': form})
+    return render(request, 'users/user_profile.html', context)
 
+
+@staff_member_required
+def all_documents(request):
+    users = User.objects.filter(is_staff=False)
+    documents = Document.objects.all()
+    paginator = Paginator(documents, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'users': users,
+        'documents': documents,
+        'page_obj': page_obj,
+    }
+    if request.htmx:
+        return render(request, 'users/includes/all_documents_list.html', context)
+    return render(request, 'users/all_documents.html', context)
+
+
+def htmx_paginate_all_docs(request):
+    documents = Document.objects.all()
+    paginator = Paginator(documents, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'documents': documents,
+        'page_obj': page_obj
+    }
+    return render(request, 'users/includes/all_documents_loop.html', context)
+
+
+# @staff_member_required
+# def upload_users(request):
+#     if request.method == "POST":
+#         bulk_user_form = DocumentForm(request.POST, request.FILES)
+#         if doc_form.is_valid():
+#             print('yes')
+#             files = request.FILES.getlist('file')
+#             print(files)
+#             for f in files:
+#                 Document.objects.create(
+#                     user=request.user.profile,
+#                     created_by=request.user,
+#                     type=doc_form.cleaned_data['type'],
+#                     file=f
+#                 )
+#             print('yes-again')
+#             return HttpResponse(status=204, headers={
+#                 'HX-Trigger': json.dumps({
+#                     "docsListChanged": None,
+#                     "showMessage": 'documents added'
+#
+#                 })
+#             })
+#     else:
+#         doc_form = DocumentForm()
+#     return render(request, 'users/document_form.html', {
+#         'doc_form': doc_form,
+#     })
