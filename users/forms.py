@@ -148,3 +148,14 @@ class DocumentForm(forms.Form):
     #     if len(files) > 3:
     #         raise ValidationError('More than 3')
     #     return files
+
+
+class BulkAddUserForm(forms.Form):
+    Types = [
+        ('TRAINER', 'Trainer'),
+        ('TRAINEE', 'Trainee'),
+        ('OBSERVER', 'OBSERVER'),
+    ]
+
+    type = forms.ChoiceField(choices=Types, widget=forms.Select(attrs={'class': 'form-select', }))
+    file = forms.FileField()

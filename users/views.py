@@ -402,31 +402,31 @@ def htmx_paginate_all_docs(request):
     return render(request, 'users/includes/all_documents_loop.html', context)
 
 
-# @staff_member_required
-# def upload_users(request):
-#     if request.method == "POST":
-#         bulk_user_form = DocumentForm(request.POST, request.FILES)
-#         if doc_form.is_valid():
-#             print('yes')
-#             files = request.FILES.getlist('file')
-#             print(files)
-#             for f in files:
-#                 Document.objects.create(
-#                     user=request.user.profile,
-#                     created_by=request.user,
-#                     type=doc_form.cleaned_data['type'],
-#                     file=f
-#                 )
-#             print('yes-again')
-#             return HttpResponse(status=204, headers={
-#                 'HX-Trigger': json.dumps({
-#                     "docsListChanged": None,
-#                     "showMessage": 'documents added'
-#
-#                 })
-#             })
-#     else:
-#         doc_form = DocumentForm()
-#     return render(request, 'users/document_form.html', {
-#         'doc_form': doc_form,
-#     })
+@staff_member_required
+def upload_users(request):
+    if request.method == "POST":
+        form = BulkAddUserForm(request.POST, request.FILES)
+        if form.is_valid():
+            print('yes')
+            file = request.FILES.get('file')
+            print(file)
+            for f in files:
+                Document.objects.create(
+                    user=request.user.profile,
+                    created_by=request.user,
+                    type=doc_form.cleaned_data['type'],
+                    file=f
+                )
+            print('yes-again')
+            return HttpResponse(status=204, headers={
+                'HX-Trigger': json.dumps({
+                    "docsListChanged": None,
+                    "showMessage": 'documents added'
+
+                })
+            })
+    else:
+        doc_form = DocumentForm()
+    return render(request, 'users/document_form.html', {
+        'doc_form': doc_form,
+    })

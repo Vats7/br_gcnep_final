@@ -56,9 +56,9 @@
                         </div>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-info mb-2" data-bs-toggle="modal"
-                                data-bs-target="#addQCatModal">
-                           Add Quiz Category
+                        <button hx-get="{% url 'cms:create_quiz_category' %}"
+                                hx-target="#dialog" class="btn btn-info mb-2">
+                            Add Quiz Category
                         </button>
                         <a href="{% url 'cms:create_quiz' %}">
                             <button type="button" class="btn btn-info mb-2">Add Quiz</button>
@@ -86,7 +86,7 @@
         </div>
     </div>
     <div id="addQuizCatModal" class="modal fade">
-        <div id="dialogQuizCat" class="modal-dialog" hx-target="this">
+        <div id="dialog" class="modal-dialog" hx-target="this">
 
         </div>
     </div>

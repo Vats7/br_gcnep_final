@@ -336,7 +336,7 @@ def update_quiz(request, pk):
         form = QuizForm(request.POST, instance=quiz)
         if form.is_valid():
             form.save()
-            return redirect('cms:all_quizzes')
+            return redirect('cms:all_quizzes_list')
     else:
         form = QuizForm(instance=quiz)
     return render(request, 'cms/create_quiz.html', {'form': form})
@@ -351,7 +351,7 @@ def create_quiz(request):
             quiz.created_by = request.user
             quiz.save()
             form.save_m2m()
-            return redirect('cms:all_quizzes')
+            return redirect('cms:all_quizzes_list')
     else:
         form = QuizForm()
     return render(request, 'cms/create_quiz.html', {'form': form})
@@ -383,11 +383,12 @@ def create_quiz_category(request):
             qc = form.save(commit=False)
             qc.created_by = request.user
             qc.save()
-            messages.success(request, 'Quiz Category Created')
-            return redirect('cms:all_quizzes')
+            return HttpResponse(status=204)
     else:
         form = QuizCategoryForm()
-    return render(request, 'cms/create_quiz.html', {'form': form})
+    return render(request, 'cms/includes/add_quiz_cat_form.html', {'form': form})
+
+
 
 
 @user_passes_test(lambda u: u.is_staff or UserType.objects.get(type='TRAINER') in u.types.all())

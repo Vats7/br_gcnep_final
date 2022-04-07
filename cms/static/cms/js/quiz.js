@@ -2,18 +2,18 @@ console.log('quiz.js')
 
 
 ;(function () {
-  const modal = new bootstrap.Modal(document.getElementById("addQuizModal"))
+  const modal = new bootstrap.Modal(document.getElementById("addQuizCatModal"))
 
   htmx.on("htmx:afterSwap", (e) => {
     // Response targeting #dialog => show the modal
-    if (e.detail.target.id == "dialogQuiz") {
+    if (e.detail.target.id == "dialog") {
       modal.show()
     }
   })
 
   htmx.on("htmx:beforeSwap", (e) => {
     // Empty response targeting #dialog => hide the modal
-    if (e.detail.target.id == "dialogQuiz" && !e.detail.xhr.response) {
+    if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
       modal.hide()
       e.detail.shouldSwap = false
     }
@@ -21,7 +21,7 @@ console.log('quiz.js')
 
   // Remove dialog content after hiding
   htmx.on("hidden.bs.modal", () => {
-    document.getElementById("dialogQuiz").innerHTML = ""
+    document.getElementById("dialog").innerHTML = ""
   })
 })()
 
