@@ -85,6 +85,7 @@ class Assignment(BaseModel):
     description = models.CharField(max_length=200)
     #trainer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+
     def __str__(self):
         return self.title
 

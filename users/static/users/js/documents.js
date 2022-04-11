@@ -1,8 +1,7 @@
 console.log('all_users')
 
-
 ;(function () {
-  const modal = new bootstrap.Modal(document.getElementById("modal"))
+  const modal = new bootstrap.Modal(document.getElementById("addDocModal"))
 
   htmx.on("htmx:afterSwap", (e) => {
     // Response targeting #dialog => show the modal
@@ -24,3 +23,5 @@ console.log('all_users')
     document.getElementById("dialog").innerHTML = ""
   })
 })()
+
+

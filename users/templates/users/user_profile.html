@@ -1,7 +1,9 @@
 {% extends 'lms/base.html' %}
 {% load static %}
-
 {% load crispy_forms_tags %}
+
+{% block head %}
+{% endblock %}
 
 {% block content %}
     <div id="layout-wrapper">
@@ -14,12 +16,9 @@
                     <div class="page-title-box">
                         <div class="row align-items-center">
                             <div class="col-md-8">
-{#                                {% if request.user.is_staff %}#}
-{#                                    <h6 class="page-title">Moderator Profile</h6>#}
-{#                                {% else %}#}
-{#                                    <h6 class="page-title">User Profile</h6>#}
-{#                                {% endif %}#}
-{#                                <h4 class="page-title">Name:  {{ request.user.name }}</h4>#}
+                                <h6 class="page-title"> User Profile</h6>
+                                <h4 class="page-title">Name: {{ user.name }}</h4>
+                                <h4 class="page-title">Email: {{ user.email }}</h4>
                             </div>
                         </div>
                     </div>

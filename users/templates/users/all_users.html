@@ -1,6 +1,16 @@
 {% extends 'lms/base.html' %}
 {% load static %}
 
+
+{% block head %}
+    <style>
+        .toast-container {
+        left:40%;
+        margin-top:5%;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 
     <div id="layout-wrapper">
@@ -46,6 +56,12 @@
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <button hx-get="{% url 'uploads:upload_users' %}"
+                                hx-target="#dialog" class="btn btn-info mb-2">
+                            Bulk Upload
+                        </button>
+                    </div>
                     <!-- end search -->
                     <div id="search-results"
                          hx-trigger="load, userListChanged from:body"
@@ -67,31 +83,25 @@
             </footer>
         </div>
     </div>
-    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl ">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Event List</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-12">
+    <div id="modal" class="modal fade">
+        <div id="dialog" class="modal-dialog" hx-target="this">
 
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
         </div>
+    </div>
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div id="toast-body" class="toast-body"></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
     </div>
 
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'users/js/users.js' %}"></script>
+    <script src="{% static 'users/js/users.js' %}" defer></script>
+    <script src="{% static 'cms/js/toast.js' %}" defer></script>
 {% endblock %}
 
 

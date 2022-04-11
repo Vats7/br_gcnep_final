@@ -1,0 +1,268 @@
+
+{% extends 'lms/base.html' %}
+{% load static %}
+
+
+
+
+{% block content %}
+<div id="layout-wrapper">
+    {% include 'lms/includes/top_menu.html' %}
+    {% include 'lms/includes/sidebar.html' %}
+    <div class="main-content indpages">
+        <div class="page-content">
+            <div class="container-fluid">
+                <!-- start page title -->
+                <div class="page-title-box">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="page-title">MODERATOR DASHBOARD</h6>
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item active">Welcome to GCNEP Dashboard <b>{{ request.user.name }}</b></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stat bg-primary text-white">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <div class="float-start mini-stat-img me-4">
+                                        <img src="{% static 'images/services-icon/02.png' %}" alt="">
+                                    </div>
+                                    <h5 class="font-size-16 text-uppercase text-white-50">Total Number Of Observer</h5>
+                                    <h4 class="fw-medium font-size-24">{{ total_observers }} <i
+                                            class="mdi mdi-arrow-down text-danger ms-2"></i></h4>
+                                </div>
+                                <div class="pt-2">
+                                    <div class="float-end">
+                                        <a href="#" class="text-white-50"><i class="mdi mdi-arrow-right h5"></i></a>
+                                    </div>
+
+                                    <p class="text-white-50 mb-0 mt-1">Since last month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stat bg-primary text-white">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <div class="float-start mini-stat-img me-4">
+                                        <img src="{% static 'images/services-icon/02.png' %}" alt="">
+                                    </div>
+                                    <h5 class="font-size-16 text-uppercase text-white-50">Total Number Of Trainers</h5>
+                                    <h4 class="fw-medium font-size-24">{{ total_trainers }} <i
+                                            class="mdi mdi-arrow-down text-danger ms-2"></i></h4>
+                                </div>
+                                <div class="pt-2">
+                                    <div class="float-end">
+                                        <a href="#" class="text-white-50"><i class="mdi mdi-arrow-right h5"></i></a>
+                                    </div>
+
+                                    <p class="text-white-50 mb-0 mt-1">Since last month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stat bg-primary text-white">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <div class="float-start mini-stat-img me-4">
+                                        <img src="{% static 'images/services-icon/03.png' %}" alt="">
+                                    </div>
+                                    <h5 class="font-size-16 text-uppercase text-white-50">Total Number Of Trainees</h5>
+                                    <h4 class="fw-medium font-size-24">{{ total_trainees }} <i
+                                            class="mdi mdi-arrow-up text-success ms-2"></i></h4>
+                                </div>
+                                <div class="pt-2">
+                                    <div class="float-end">
+                                        <a href="#" class="text-white-50"><i class="mdi mdi-arrow-right h5"></i></a>
+                                    </div>
+
+                                    <p class="text-white-50 mb-0 mt-1">Since last month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stat bg-primary text-white">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <div class="float-start mini-stat-img me-4">
+                                        <img src="{% static 'images/services-icon/04.png' %}" alt="">
+                                    </div>
+                                    <h5 class="font-size-16 text-uppercase text-white-50">Total no of
+                                        Training/Course </h5>
+                                    <h4 class="fw-medium font-size-24">{{ total_trainings }} <i
+                                            class="mdi mdi-arrow-up text-success ms-2"></i></h4>
+                                </div>
+                                <div class="pt-2">
+                                    <div class="float-end">
+                                        <a href="#" class="text-white-50"><i class="mdi mdi-arrow-right h5"></i></a>
+                                    </div>
+
+                                    <p class="text-white-50 mb-0 mt-1">Since last month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+{#                    <div class="col-xl-3 col-md-6">#}
+{#                        <div class="card mini-stat bg-primary text-white">#}
+{#                            <div class="card-body">#}
+{#                                <div class="mb-4">#}
+{#                                    <div class="float-start mini-stat-img me-4">#}
+{#                                        <img src="{% static 'images/services-icon/02.png' %}" alt="">#}
+{#                                    </div>#}
+{#                                    <h5 class="font-size-16 text-uppercase text-white-50">Total no of Schools</h5>#}
+{#                                    <h4 class="fw-medium font-size-24">52,368 <i#}
+{#                                            class="mdi mdi-arrow-down text-danger ms-2"></i></h4>#}
+{#                                </div>#}
+{#                                <div class="pt-2">#}
+{#                                    <div class="float-end">#}
+{#                                        <a href="#" class="text-white-50"><i class="mdi mdi-arrow-right h5"></i></a>#}
+{#                                    </div>#}
+{##}
+{#                                    <p class="text-white-50 mb-0 mt-1">Since last month</p>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="col-xl-3 col-md-6">#}
+{#                        <div class="card mini-stat bg-primary text-white">#}
+{#                            <div class="card-body">#}
+{#                                <div class="mb-4">#}
+{#                                    <div class="float-start mini-stat-img me-4">#}
+{#                                        <img src="{% static 'images/services-icon/03.png' %}" alt="">#}
+{#                                    </div>#}
+{#                                    <h5 class="font-size-16 text-uppercase text-white-50">Total no of Programs/Events/#}
+{#                                        Technical presentations</h5>#}
+{#                                    <h4 class="fw-medium font-size-24">15.8 <i#}
+{#                                            class="mdi mdi-arrow-up text-success ms-2"></i></h4>#}
+{#                                </div>#}
+{#                                <div class="pt-2">#}
+{#                                    <div class="float-end">#}
+{#                                        <a href="#" class="text-white-50"><i class="mdi mdi-arrow-right h5"></i></a>#}
+{#                                    </div>#}
+{##}
+{#                                    <p class="text-white-50 mb-0 mt-1">Since last month</p>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+
+
+                </div>
+                <!-- end row -->
+{##}
+{#                <div class="row">#}
+{#                    <div class="col-xl-9">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body">#}
+{#                                <h4 class="card-title mb-4">Monthly Earning</h4>#}
+{#                                <div class="row clsmonthy">#}
+{#                                    <div class="col-lg-7">#}
+{#                                        <div>#}
+{#                                            <div id="chart-with-area" class="ct-chart earning ct-golden-section">#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                    <div class="col-lg-5">#}
+{#                                        <div class="row">#}
+{#                                            <div class="col-md-6">#}
+{#                                                <div class="text-center">#}
+{#                                                    <p class="text-muted mb-4">This month</p>#}
+{#                                                    <h3>34,252</h3>#}
+{#                                                    <p class="text-muted mb-5">It will be as simple as in fact it#}
+{#                                                        will be occidental.</p>#}
+{#                                                    <span class="peity-donut"#}
+{#                                                          data-peity='{ "fill": ["#02a499", "#f2f2f2"], "innerRadius": 28, "radius": 32 }'#}
+{#                                                          data-width="72" data-height="72">4/5</span>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                            <div class="col-md-6">#}
+{#                                                <div class="text-center">#}
+{#                                                    <p class="text-muted mb-4">Last month</p>#}
+{#                                                    <h3>36,253</h3>#}
+{#                                                    <p class="text-muted mb-5">It will be as simple as in fact it#}
+{#                                                        will be occidental.</p>#}
+{#                                                    <span class="peity-donut"#}
+{#                                                          data-peity='{ "fill": ["#02a499", "#f2f2f2"], "innerRadius": 28, "radius": 32 }'#}
+{#                                                          data-width="72" data-height="72">3/5</span>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <!-- end row -->#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <!-- end card -->#}
+{#                    </div>#}
+{##}
+{#                    <div class="col-xl-3">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body">#}
+{#                                <h4 class="card-title mb-4">Sales Report</h4>#}
+{##}
+{#                                <div class="cleafix">#}
+{#                                    <p class="float-start"><i class="mdi mdi-calendar me-1 text-primary"></i> Jan 01#}
+{#                                        - Jan 31</p>#}
+{#                                    <h5 class="font-18 text-end">4230</h5>#}
+{#                                </div>#}
+{##}
+{#                                <div id="ct-donut" class="ct-chart wid"></div>#}
+{##}
+{#                                <div class="mt-4">#}
+{#                                    <table class="table mb-0">#}
+{#                                        <tbody>#}
+{#                                        <tr>#}
+{#                                            <td><span class="badge bg-primary">Desk</span></td>#}
+{#                                            <td>Desktop</td>#}
+{#                                            <td class="text-end">54.5%</td>#}
+{#                                        </tr>#}
+{#                                        <tr>#}
+{#                                            <td><span class="badge bg-success">Mob</span></td>#}
+{#                                            <td>Mobile</td>#}
+{#                                            <td class="text-end">28.0%</td>#}
+{#                                        </tr>#}
+{#                                        </tbody>#}
+{#                                    </table>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- end row -->#}
+
+
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        ©
+                        <script>document.write(new Date().getFullYear())</script>
+                        GCNEP
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</div>
+<div class="rightbar-overlay"></div>
+{% endblock %}

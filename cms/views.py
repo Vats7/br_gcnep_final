@@ -145,7 +145,7 @@ def upload_questions(request):
             return HttpResponse(status=204, headers={
                 'HX-Trigger': json.dumps({
                     "questionListChanged": None,
-                    "showMessage": f"question added."
+                    "showMessage": f"{len(objs)} questions added."
                 })
             })
     else:
@@ -169,8 +169,7 @@ def create_assignment(request):
             return HttpResponse(status=204, headers={
                 'HX-Trigger': json.dumps({
                     "assignmentListChanged": None,
-                    "showMessage": 'assignment added'
-                    # "showMessage": f"{assignment.title} added."
+                    "showMessage": 'assignment added successfully'
                 })
             })
     else:
@@ -302,22 +301,12 @@ def update_assignment(request, pk):
         if form.is_valid():
             form.save()
             return redirect('cms:all_assignments_list')
-            # return HttpResponse(
-            #     status=204,
-            #     headers={
-            #         'HX-Trigger': json.dumps({
-            #             "assignmentListChanged": None,
-            #             "showMessage": f"{assignment.title} updated."
-            #         })
-            #     }
-            # )
     else:
         form = AssignmentForm(instance=assignment)
     return render(request, 'cms/create_assignment.html', {
         'form': form,
         'assignment': assignment,
     })
-
 
 
 ##########################################################################
@@ -383,7 +372,13 @@ def create_quiz_category(request):
             qc = form.save(commit=False)
             qc.created_by = request.user
             qc.save()
-            return HttpResponse(status=204)
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "showMessage": f"quiz category added"
+                    })
+                })
     else:
         form = QuizCategoryForm()
     return render(request, 'cms/includes/add_quiz_cat_form.html', {'form': form})

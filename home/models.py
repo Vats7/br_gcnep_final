@@ -18,6 +18,7 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['-created_at']
 
 
 class School(BaseModel):

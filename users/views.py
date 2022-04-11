@@ -20,9 +20,7 @@ from users.forms import LoginForm, SignUpForm, UserProfileForm, \
     UserChangeFormNew, UserCreationFormNew, ModProfileForm, DocumentForm
 from django.views.decorators.cache import cache_control
 from django.db.models.query_utils import Q
-
-from users.models import Document
-
+from users.models import Document, UserProfile
 User = get_user_model()
 
 
@@ -130,8 +128,12 @@ def my_profile_view(request):
                 'profile_form': profile_form
             }
         else:
-            profile = request.user.profile
-            profile_form = UserProfileForm(instance=profile)
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            # profile = request.user.profile
+            if created:
+                profile_form = UserProfileForm(instance=request.user.profile)
+            else:
+                profile_form = UserProfileForm(instance=profile)
             doc_form = DocumentForm()
             context = {
                 'profile_form': profile_form,
@@ -143,15 +145,15 @@ def my_profile_view(request):
 @method_decorator(staff_member_required, name='dispatch')
 class UserList(ListView):
     model = User
-    template_name = 'users/includes/user_list.html'
+    template_name = 'users/all_users.html'
     context_object_name = 'users'
     paginate_by = 5
     permission_classes = []
 
-    def get_template_names(self):
-        if self.request.htmx:
-            return 'users/includes/user_list.html'
-        return 'users/all_users.html'
+    # def get_template_names(self):
+    #     if self.request.htmx:
+    #         return 'users/includes/user_list.html'
+    #     return 'users/all_users.html'
 
     def get_queryset(self):
         queryset = User.objects.all()
@@ -159,6 +161,23 @@ class UserList(ListView):
             return queryset
         else:
             return queryset.filter(is_staff=False)
+
+
+@staff_member_required
+def all_users_list(request):
+    if request.user.is_superuser:
+        users = User.objects.all()
+    else:
+        users = User.objects.filter(is_staff=False)
+
+    paginator = Paginator(users, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'users': users,
+        'page_obj': page_obj,
+    }
+    return render(request, 'users/includes/user_list.html', context)
 
 
 def htmx_paginate_users(request):
@@ -199,7 +218,7 @@ def create_user(request):
         form = UserCreationFormNew(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('users:user_list')
+            return redirect('users:all_users')
     else:
         form = UserCreationFormNew()
     return render(request, 'users/create_user.html', {'form': form})
@@ -228,7 +247,7 @@ def update_user(request, id):
         form = UserChangeFormNew(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('users:user_list')
+            return redirect('users:all_users')
     else:
         form = UserChangeFormNew(instance=user)
     return render(request, 'users/update_user.html', {'form': form, 'user': user})
@@ -364,10 +383,14 @@ def user_profile_view(request, id):
                 'form': form
             }
         else:
-            profile = user.profile
-            form = UserProfileForm(instance=profile)
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            if created:
+                form = UserProfileForm(instance=user.profile)
+            else:
+                form = UserProfileForm(instance=profile)
             context = {
                 'form': form,
+                'user': user,
             }
     return render(request, 'users/user_profile.html', context)
 
@@ -400,33 +423,3 @@ def htmx_paginate_all_docs(request):
         'page_obj': page_obj
     }
     return render(request, 'users/includes/all_documents_loop.html', context)
-
-
-@staff_member_required
-def upload_users(request):
-    if request.method == "POST":
-        form = BulkAddUserForm(request.POST, request.FILES)
-        if form.is_valid():
-            print('yes')
-            file = request.FILES.get('file')
-            print(file)
-            for f in files:
-                Document.objects.create(
-                    user=request.user.profile,
-                    created_by=request.user,
-                    type=doc_form.cleaned_data['type'],
-                    file=f
-                )
-            print('yes-again')
-            return HttpResponse(status=204, headers={
-                'HX-Trigger': json.dumps({
-                    "docsListChanged": None,
-                    "showMessage": 'documents added'
-
-                })
-            })
-    else:
-        doc_form = DocumentForm()
-    return render(request, 'users/document_form.html', {
-        'doc_form': doc_form,
-    })

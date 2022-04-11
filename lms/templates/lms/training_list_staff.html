@@ -4,7 +4,18 @@
 
 
 {% block head %}
-
+    <style>
+        .toast-container {
+        left:40%;
+        margin-top:5%;
+        }
+        .htmx-settling img {
+          opacity: 0;
+        }
+        img {
+         transition: opacity 300ms ease-in;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -55,9 +66,11 @@
                     </div>
                     <!-- end search -->
                     <div id="search-results"
-                         hx-trigger="load"
+                         hx-trigger="load, trainingListChanged from:body"
                          hx-get="{% url 'lms:my_trainings_list' %}"
-                         hx-target="this">
+                         hx-target="this"
+                    >
+                        <img  alt="Result loading..." class="htmx-indicator" width="150" src="{% static 'images/bars.svg' %}"/>
                     </div>
                 </div>
             </div>
@@ -170,11 +183,19 @@
             </div>
         </div>
     </div>
-
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div id="toast-body" class="toast-body"></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'lms/js/my_trainings.js' %}" defer></script>
+{#    <script src="{% static 'lms/js/my_trainings.js' %}" defer></script>#}
+    <script src="{% static 'cms/js/toast.js' %}" defer></script>
     <script>
         $('#viewModalBtn').click(function () {
             $('#training-title').html($(this).data('title'));

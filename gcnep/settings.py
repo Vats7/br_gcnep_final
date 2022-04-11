@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'lms.apps.LmsConfig',
     'cms.apps.CmsConfig',
     'home.apps.HomeConfig',
+    'uploads.apps.UploadsConfig',
 
     'crispy_forms',
     'django_extensions',

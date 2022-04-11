@@ -1,3 +1,4 @@
+from datetime import datetime
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserCreationForm
@@ -65,6 +66,7 @@ class UserCreationFormNew(forms.ModelForm):
 
 class UserChangeFormNew(forms.ModelForm):
     types = forms.ModelMultipleChoiceField(
+        required=False,
         queryset=UserType.objects.filter(type__in=['TRAINER', 'TRAINEE', 'OBSERVER']),
         widget=forms.CheckboxSelectMultiple()
     )
@@ -91,6 +93,12 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['first_name', 'last_name', 'gender', 'dob', 'pob', 'org_ins',
                   'ofc_add', 'ofc_number', 'nationality', 'fax', 'secondary_email']
+        widgets = {
+            'dob': forms.DateInput(attrs={
+                'type': 'date',
+                'max': datetime.now().date(),
+            })
+        }
 
 
 class ModProfileForm(forms.ModelForm):

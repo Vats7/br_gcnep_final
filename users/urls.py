@@ -24,8 +24,8 @@ urlpatterns = [
     path("users/htmx_paginate_user_docs/<int:id>", views.htmx_paginate_user_docs, name="htmx_paginate_user_docs"),
 
 
-
-    path('user_list', views.UserList.as_view(), name='all_users_list'),
+    path('users/all_users', views.UserList.as_view(), name='all_users'),
+    path('users/all_users_list', views.all_users_list, name='all_users_list'),
     path('htmx_paginate_users', views.htmx_paginate_users, name='htmx_paginate_users'),
 
     path('user_search', views.user_search, name='user_search'),

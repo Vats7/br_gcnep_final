@@ -2,6 +2,16 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+
+{% block head %}
+    <style>
+        .toast-container {
+        left:40%;
+        margin-top:5%;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
     <div id="layout-wrapper">
         {% include 'lms/includes/top_menu.html' %}
@@ -93,12 +103,21 @@
 
         </div>
     </div>
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div id="toast-body" class="toast-body"></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
 
 {% endblock %}
 
 {% block scripts %}
 
     <script src="{% static 'cms/js/questions.js' %}" defer></script>
+    <script src="{% static 'cms/js/toast.js' %}" defer></script>
 {% endblock %}
 
 

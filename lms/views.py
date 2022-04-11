@@ -1,6 +1,8 @@
+import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
@@ -8,11 +10,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
-
 from lms.models import Training, Enrollment
 import boto3
 from django.contrib.auth.decorators import user_passes_test
+
+from users.models import UserType
 from .forms import EnrollmentForm, BulkAddAttendeeForm, TrainingForm
+User = get_user_model()
 
 client = boto3.client(
     'chime-sdk-meetings',
@@ -24,7 +28,34 @@ client = boto3.client(
 
 @login_required
 def index(request):
-    return render(request, 'lms/index.html',)
+    trainer = UserType.objects.get(type='TRAINER')
+    trainee = UserType.objects.get(type='TRAINEE')
+    observer = UserType.objects.get(type='OBSERVER')
+    if request.user.is_superuser:
+        context = {
+            'total_users': User.objects.all().count(),
+            'total_moderators': User.objects.filter(is_mod=True).count(),
+            'total_trainers': User.objects.filter(types__in=[trainer]).count(),
+            'total_trainees': User.objects.filter(types__in=[trainee]).count(),
+            'total_observers': User.objects.filter(types__in=[observer]).count(),
+            'total_trainings': Training.objects.all().count()
+        }
+        return render(request, 'lms/admin_index.html', context=context)
+    elif request.user.is_mod:
+        context = {
+            'total_trainers': User.objects.filter(types__in=[trainer]).count(),
+            'total_trainees': User.objects.filter(types__in=[trainee]).count(),
+            'total_observers': User.objects.filter(types__in=[observer]).count(),
+            'total_trainings': Training.objects.filter(created_by=request.user).count()
+        }
+        return render(request, 'lms/mod_index.html', context)
+    else:
+        context = {
+            'my_trainings': request.user.training_set.all().count(),
+
+        }
+        return render(request, 'lms/user_index.html', context)
+
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -200,7 +231,13 @@ def update_training(request, pk):
 def delete_training(request, pk):
     training = get_object_or_404(Training, pk=pk)
     training.delete()
-    return HttpResponse('')
+    return HttpResponse(
+        status=204, headers={
+            'HX-Trigger': json.dumps({
+                "trainingListChanged": None,
+                "showMessage": f"training deleted"
+            })
+        })
 
 
 @staff_member_required

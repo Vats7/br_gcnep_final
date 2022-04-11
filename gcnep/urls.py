@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('users.urls')),
     path('', include('home.urls')),
     path('', include('cms.urls')),
+    path('', include('uploads.urls')),
     path("select2/", include("django_select2.urls")),
     path('jsi18n', JavaScriptCatalog.as_view(), name='js-catalog'),
     path('password_reset/done/',
