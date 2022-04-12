@@ -1,4 +1,6 @@
-{% if documents %}
+
+
+{% if all_files %}
 <div class="row">
     <div class="col-lg-12">
         <div class="card ">
@@ -9,18 +11,22 @@
                             <table class="table text-center mb-20">
                                 <thead>
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Uploaded at</th>
-                                    <th>View</th>
-                                    <th>Action</th>
+                                    <th>File</th>
+                                    <th>Notes</th>
+                                    <th>Uploaded By</th>
+                                    <td>Date</td>
+                                    <td>Actions</td>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% include 'users/includes/my_documents_loop.html' %}
+                                    {% include 'uploads/includes/all_files_loop.html' %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    {% include 'lms/includes/pagination.html' %}
                 </div>
             </div>
         </div>
@@ -33,7 +39,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            No Documents
+                            No Files Uploaded
                         </div>
                     </div>
                 </div>

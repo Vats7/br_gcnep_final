@@ -15,7 +15,21 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% include 'cms/includes/questions_loop.html' %}
+                                {% for q in questions %}
+                                    <tr hx-target="this" hx-swap="outerHTML">
+                                        <td>{{ q.question }}</td>
+                                        <td>{{ q.marks }}</td>
+                                        <td>
+                                            <a hx-delete="{% url 'cms:delete_question' q.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            <a href="{% url 'cms:update_question' q.unique_id %}"
+                                               class="btn btn-info btn-sm edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>

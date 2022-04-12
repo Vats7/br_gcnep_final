@@ -192,6 +192,7 @@ def htmx_paginate_users(request):
     return render(request, 'users/includes/user_list_loop.html', context=context)
 
 
+@staff_member_required
 def user_search(request):
     if request.method == 'GET':
         url_parameter = request.GET.get("query")
@@ -271,7 +272,7 @@ def upload_documents(request):
             print('yes-again')
             return HttpResponse(status=204, headers={
                 'HX-Trigger': json.dumps({
-                    "docsListChanged": None,
+                    "myDocListChanged": None,
                     "showMessage": 'documents added'
 
                 })
@@ -297,6 +298,20 @@ def get_my_documents(request):
     if request.htmx:
         return render(request, 'users/includes/my_documents_list.html', context)
     return render(request, 'users/my_documents.html', context)
+
+
+@require_http_methods(['DELETE'])
+def delete_my_document(request, pk):
+    document = get_object_or_404(Document, pk=pk, user=request.user.profile)
+    document.delete()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "myDocListChanged": None,
+                "showMessage": f"document deleted."
+            })
+        })
 
 
 def htmx_paginate_my_docs(request):

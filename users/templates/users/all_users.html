@@ -5,8 +5,17 @@
 {% block head %}
     <style>
         .toast-container {
-        left:40%;
-        margin-top:5%;
+            left:40%;
+            margin-top:5%;
+        }
+        .htmx-settling img {
+            opacity: 0;
+        }
+        img {
+            transition: opacity 300ms ease-in;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 {% endblock %}
@@ -41,11 +50,15 @@
                                                 <div class="mb-3 col-lg-3">
                                                     <label class="form-label" for="query">Search...</label>
                                                     <i id="search-icon" class="fas fa-search"></i>
+{#                                                    <span class="htmx-indicator">#}
+{#                                                        <img src="{% static 'images/bars.svg' %}"/> Searching...#}
+{#                                                    </span>#}
                                                     <input type="text" class="form-control"
                                                            hx-get="{% url 'users:user_search' %}"
                                                            hx-target="#search-results"
-                                                           hx-trigger="keyup changed delay:500ms"
+                                                           hx-trigger="keyup changed delay:500ms, search"
                                                            hx-swap="innerHTML"
+                                                           hx-indicator=".htmx-indicator"
                                                            name="query"
                                                     />
                                                 </div>
@@ -66,7 +79,9 @@
                     <div id="search-results"
                          hx-trigger="load, userListChanged from:body"
                          hx-get="{% url 'users:all_users_list' %}"
-                         hx-target="this">
+                         hx-target="this"
+                    >
+                        <img  alt="Result loading..." class="htmx-indicator" width="150" src="{% static 'images/bars.svg' %}"/>
                     </div>
                 </div>
             </div>

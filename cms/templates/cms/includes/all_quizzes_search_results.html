@@ -1,0 +1,70 @@
+{% load custom_tags %}
+
+
+{% if quizzes %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card ">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table text-center mb-20">
+                                <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Difficulty</th>
+                                    <th>Questions</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for q in quizzes %}
+                                    <tr hx-target="this" hx-swap="outerHTML">
+                                        <td>{{ q.category }}</td>
+                                        <td>{{ q.title }}</td>
+                                        <td>{{ q.description }}</td>
+                                        <td>{{ q.status }}</td>
+                                        <td>{{ q.difficulty }}</td>
+                                        <td>{{ q.total_questions }}</td>
+                                        {% if request.user.is_staff %}
+                                            <td>
+                                                <a hx-delete="{% url 'cms:delete_quiz' q.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit"> <i class="fas fa-trash"></i></a>
+                                                <a href="{% url 'cms:update_quiz' q.unique_id %}"
+                                                       class="btn btn-info btn-sm edit">
+                                                        <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td>View</td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card ">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            No Quizzes
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

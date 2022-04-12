@@ -3,15 +3,11 @@
         <td>{{ d.type }}</td>
         <th>{{ d.created_at }}</th>
         <td><a href="{{ d.file.url }}">view</a></td>
-{#        <td>#}
-{#            <a hx-delete="{% url 'cms:delete_assignment' a.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit">#}
-{#                <i class="fas fa-trash"></i>#}
-{#            </a>#}
-{#            <a href="{% url 'cms:update_assignment' a.unique_id %}"#}
-{#                   class="btn btn-info btn-sm edit">#}
-{#                    <i class="fas fa-edit"></i>#}
-{#            </a>#}
-{#        </td>#}
+        <td>
+            <a hx-delete="{% url 'users:delete_my_document' d.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
     </tr>
 {% endfor %}
 

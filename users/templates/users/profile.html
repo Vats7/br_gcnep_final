@@ -1,7 +1,12 @@
 {% extends 'lms/base.html' %}
 {% load static %}
-
 {% load crispy_forms_tags %}
+
+{% block head %}
+{#    <style>#}
+{#        input {max-width: 12em}#}
+{#    </style>#}
+{% endblock %}
 
 {% block content %}
     <div id="layout-wrapper">
@@ -27,16 +32,13 @@
                         <div class="col mb-3">
                             <button class="btn btn-primary">Add Employment</button>
                             <button class="btn btn-primary">Add Education</button>
-{#                        <button hx-get="{% url 'users:upload_documents' %}" hx-target="#dialog">#}
-{#                            Add Documents#}
-{#                        </button>#}
                             <a href="{% url 'users:get_my_documents' %}">
                                 <button class="btn btn-primary">My Documents</button>
                             </a>
                         </div>
                     {% endif %}
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-body">
                                     <form id="profile-form" method="POST">

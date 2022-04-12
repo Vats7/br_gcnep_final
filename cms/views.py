@@ -1,5 +1,4 @@
 import json
-from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -64,7 +63,7 @@ def search_all_questions(request):
             context = {
                 'questions': questions
             }
-        return render(request, 'cms/includes/all_questions_list.html', context=context)
+        return render(request, 'cms/includes/all_questions_search_results.html', context=context)
 
 
 @user_passes_test(lambda u: u.is_staff or UserType.objects.get(type='TRAINER') in u.types.all())
@@ -384,8 +383,6 @@ def create_quiz_category(request):
     return render(request, 'cms/includes/add_quiz_cat_form.html', {'form': form})
 
 
-
-
 @user_passes_test(lambda u: u.is_staff or UserType.objects.get(type='TRAINER') in u.types.all())
 def all_quizzes_list(request):
     if request.user.is_staff:
@@ -464,7 +461,7 @@ def all_quizzes_search(request):
         context = {
             'quizzes': quizzes
         }
-        return render(request, 'cms/includes/all_quizzes_list.html', context=context)
+        return render(request, 'cms/includes/all_quizzes_search_results.html', context=context)
 
 
 def my_quizzes_search(request):
@@ -480,4 +477,4 @@ def my_quizzes_search(request):
         context = {
             'quizzes': quizzes
         }
-        return render(request, 'cms/includes/all_quizzes_list.html', context=context)
+        return render(request, 'cms/includes/all_quizzes_search_results.html', context=context)
