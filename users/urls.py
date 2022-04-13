@@ -5,17 +5,19 @@ from . import views
 app_name = "users"
 
 urlpatterns = [
-    path("register", views.register_view, name="register"),
+    # path("register", views.register_view, name="register"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("password_reset", views.password_reset_request, name="password_reset"),
+    path('change_password/', views.change_password, name='change_password'),
+
+
     path("my_profile/", views.my_profile_view, name="my_profile"),
     path("user_profile_view/<int:id>/", views.user_profile_view, name="user_profile_view"),
 
 
     path("users/all_documents", views.all_documents, name="all_documents"),
     path("users/htmx_paginate_all_docs", views.htmx_paginate_all_docs, name="htmx_paginate_all_docs"),
-
     path("users/upload_documents/", views.upload_documents, name="upload_documents"),
     path("users/delete_my_document/<str:pk>/", views.delete_my_document, name="delete_my_document"),
     path("users/get_my_documents", views.get_my_documents, name="get_my_documents"),
@@ -33,7 +35,6 @@ urlpatterns = [
 
     path('<int:id>/update_user', views.update_user, name='update_user'),
     path('create_user', views.create_user, name='create_user'),
-
     path('delete_user/<int:id>', views.delete_user, name='delete_user'),
 
 ]

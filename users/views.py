@@ -1,9 +1,9 @@
 import json
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
 from django.core.paginator import Paginator
@@ -23,23 +23,23 @@ from django.db.models.query_utils import Q
 from users.models import Document, UserProfile
 User = get_user_model()
 
-
-def register_view(request):
-    if request.method == "POST":
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            u_types = form.cleaned_data['types']
-            user.types.add(*u_types)
-            user.save()
-            print(user)
-            login(request, user)
-            messages.success(request, "Registration successful.")
-            return redirect("lms:home")
-        messages.error(request, form.errors)
-    else:
-        form = SignUpForm()
-    return render(request=request, template_name="users/register.html", context={"form": form})
+#
+# def register_view(request):
+#     if request.method == "POST":
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             u_types = form.cleaned_data['types']
+#             user.types.add(*u_types)
+#             user.save()
+#             print(user)
+#             login(request, user)
+#             messages.success(request, "Registration successful.")
+#             return redirect("lms:home")
+#         messages.error(request, form.errors)
+#     else:
+#         form = SignUpForm()
+#     return render(request=request, template_name="users/register.html", context={"form": form})
 
 
 @cache_control(no_cache=True, must_revalidate=True)
@@ -68,7 +68,6 @@ def login_view(request):
 @cache_control(no_cache=True, must_revalidate=True)
 def logout_view(request):
     logout(request)
-    #messages.info(request, "You have successfully logged out.")
     return redirect("users:login")
 
 
@@ -101,6 +100,24 @@ def password_reset_request(request):
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="users/password_reset.html",
                   context={"password_reset_form": password_reset_form})
+
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            logout(request)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('lms:home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'users/change_password.html', {
+        'form': form
+    })
 
 
 @user_passes_test(lambda u: not u.is_superuser)
@@ -142,6 +159,9 @@ def my_profile_view(request):
     return render(request, 'users/profile.html', context=context)
 
 
+########################################################################################################################
+########################################################################################################################
+##########################################################################################
 @method_decorator(staff_member_required, name='dispatch')
 class UserList(ListView):
     model = User
@@ -181,7 +201,11 @@ def all_users_list(request):
 
 
 def htmx_paginate_users(request):
-    users = User.objects.all()
+    if request.user.is_superuser:
+        users = User.objects.all()
+    else:
+        users = User.objects.filter(is_staff=False)
+
     paginator = Paginator(users, 5)  # Show 25 contacts per page.
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
