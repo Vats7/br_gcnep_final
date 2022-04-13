@@ -6,7 +6,6 @@
     <div data-simplebar class="h-100">
         <div id="sidebar-menu">
             <ul class="metismenu list-unstyled" id="side-menu">
-
                 {% if not request.user.is_staff %}
                     <!--dash-->
                     <li>
@@ -37,7 +36,6 @@
                         </ul>
                     </li>
                     <!--Study content-->
-
                     {% if request.user|has_type:"TRAINER" %}
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -81,12 +79,14 @@
 {#                        </ul>#}
                     </li>
                 {% else %}
+                    <!--Dash-->
                     <li>
                         <a href="{% url 'lms:home' %}" class="waves-effect">
                             <i class="ti-home"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    <!--USER MANAGEMENT-->
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="ti-book"></i>
@@ -99,6 +99,7 @@
                             <li><a href="{% url 'users:create_user' %}">Create Account</a></li>
                         </ul>
                     </li>
+                    <!--TRAINING MANGEM<ENT-->
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="ti-book"></i>
@@ -112,6 +113,7 @@
                             <li><a href="{% url 'lms:create_training' %}">Create Training</a></li>
                         </ul>
                     </li>
+                    <!--COURSE MANAGEMENT-->
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="ti-book"></i>
@@ -138,7 +140,7 @@
                             <li><a href="{% url 'cms:all_questions_list' %}">All Questions</a></li>
                         </ul>
                     </li>
-                    <!--Roles-->
+
 {#                    <li>#}
 {#                        <a href="javascript: void(0);" class="has-arrow waves-effect">#}
 {#                            <i class="ti-book"></i>#}

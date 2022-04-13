@@ -1,0 +1,79 @@
+{% for t in page_obj %}
+    <tr hx-target="this" hx-swap="outerHTML">
+        <td><img src="{{ t.main_image.url }}" height="50px"></td>
+        <td><a href="{% url 'lms:training_detail' t.unique_id %}">{{ t.title }}</a></td>
+        <td>{{ t.description }}</td>
+        <td>{{ t.total_attendees }}</td>
+        <td>
+            <a href="{% url 'lms:create_enrollment' t.unique_id %}">
+                <button class="btn btn-primary">Add</button>
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'lms:bulk_add_attendee' t.unique_id %}">
+                <button class="btn btn-primary">Bulk</button>
+            </a>
+        </td>
+        <td>
+            <a class="btn btn-primary btn-sm edit"
+               id="viewModalBtn"
+               title="View"
+               data-bs-toggle="modal"
+               data-bs-target="#viewModal"
+               data-title="{{ t.title }}"
+               data-description="{{ t.description }}"> <i
+                    class="fas fa-eye"></i>
+            </a>
+            <a class="btn btn-primary btn-sm edit"
+               id="updateModalBtn"
+               title="Update"
+               data-bs-toggle="modal"
+               data-bs-target="#updateModal"> <i
+                    class="fas fa-eye"></i>
+            </a>
+{#                                            <button hx-delete="{% url 'lms:delete_training' t.unique_id %}" hx-confirm="Are You Sure..?">Delete</button>#}
+            <a hx-delete="{% url 'lms:delete_training' t.unique_id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit"> <i class="fas fa-trash"></i>
+            </a>
+        </td>
+        {% if not t.chime_id %}
+            <td>
+                <a href="{% url 'lms:start_training' t.unique_id %}">
+                    <button class="btn btn-primary">
+                        Start
+                    </button>
+                </a>
+            </td>
+        {% else %}
+            {% if t.has_finished %}
+                <td>
+                    <a href="{% url 'lms:start_training' t.unique_id %}">
+                        <button class="btn btn-primary">
+                            Restart
+                        </button>
+                    </a>
+                </td>
+            {% else %}
+                <td>
+                    <a href="{% url 'lms:join_meeting' t.unique_id %}">
+                        <button class="btn btn-primary">
+                            Join
+                        </button>
+                    </a>
+                </td>
+            {% endif %}
+        {% endif %}
+    </tr>
+{% endfor %}
+
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'lms:htmx_paginate_my_trainings' %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}

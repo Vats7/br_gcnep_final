@@ -1,9 +1,10 @@
-{% for t in trainings %}
+{% for t in page_obj %}
 
 <tr hx-target="this" hx-swap="outerHTML">
     <td><img src="{{ t.main_image.url }}" height="50px"></td>
     <td><a href="{% url 'lms:training_detail' t.unique_id %}">{{ t.title }}</a></td>
     <td>{{ t.description }}</td>
+    <td>{{ t.created_by }}</td>
     <td>{{ t.total_attendees }}</td>
     <td>{{ t.start_at }}</td>
     <td>{{ t.duration }}</td>
@@ -21,3 +22,17 @@
     </td>
 </tr>
 {% endfor %}
+
+
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'lms:htmx_paginate_all_trainings' %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}

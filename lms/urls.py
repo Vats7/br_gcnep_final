@@ -7,9 +7,15 @@ urlpatterns = [
     path('', views.index, name='home'),
     #path('my_trainings', views.MyTrainingList.as_view(), name='my_trainings')
     path('my_trainings', views.my_trainings, name='my_trainings'),
+    path('my_trainings_list', views.my_trainings_list, name='my_trainings_list'),
+
     path('all_trainings', views.all_trainings, name='all_trainings'),
     path('<str:pk>/detail', views.training_detail, name='training_detail'),
-    path('all_trainings_list', views.AllTrainingsList.as_view(), name='all_trainings_list'),
+    # path('all_trainings_list', views.AllTrainingsList.as_view(), name='all_trainings_list'),
+    path('all_trainings_list', views.all_trainings_list, name='all_trainings_list'),
+    path('htmx_paginate_all_trainings', views.htmx_paginate_all_trainings, name='htmx_paginate_all_trainings'),
+    path('htmx_paginate_my_trainings', views.htmx_paginate_my_trainings, name='htmx_paginate_my_trainings'),
+
     path('my_training_list', views.my_trainings_list, name='my_trainings_list'),
 
 

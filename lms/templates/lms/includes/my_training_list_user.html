@@ -17,35 +17,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    {% for t in trainings %}
-                                        <tr>
-                                            <td><img src="{{ t.main_image.url }}" height="50px"></td>
-                                            <td>{{ t.title }}</td>
-                                            <td>{{ t.description }}</td>
-                                            <td>
-                                                <a class="btn btn-primary btn-sm edit"
-                                                   id="viewModalBtn"
-                                                   title="View"
-                                                   data-bs-toggle="modal"
-                                                   data-bs-target="#viewModal"
-                                                   data-title="{{ t.title }}"
-                                                   data-description="{{ t.description }}"> <i
-                                                        class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                            {% if t.is_started %}
-                                                <td>
-                                                    <a href="{% url 'lms:join_meeting' t.unique_id %}">
-                                                        <button class="btn btn-primary">
-                                                            Join
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                            {% else %}
-                                                <td>Not Started</td>
-                                            {% endif %}
-                                        </tr>
-                                    {% endfor %}
+                                    {% include 'lms/includes/my_trainings_user_loop.html' %}
                                 </tbody>
                             </table>
                         </div>

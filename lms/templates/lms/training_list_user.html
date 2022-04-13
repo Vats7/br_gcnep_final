@@ -55,8 +55,12 @@
                         </div>
                     </div>
                     <!-- end search -->
-                    <div id="search-results">
-                        {% include 'lms/includes/my_training_list_user.html' %}
+                    <div id="search-results"
+                         hx-trigger="load, trainingListChanged from:body"
+                         hx-get="{% url 'lms:my_trainings_list' %}"
+                         hx-target="this"
+                    >
+                        <img  alt="Result loading..." class="htmx-indicator" width="150" src="{% static 'images/bars.svg' %}"/>
                     </div>
                 </div> <!-- container-fluid -->
             </div>

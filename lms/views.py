@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -57,28 +58,42 @@ def index(request):
         return render(request, 'lms/user_index.html', context)
 
 
-
 @user_passes_test(lambda u: u.is_superuser)
 def all_trainings(request):
     return render(request, 'lms/all_trainings.html')
 
 
-# @user_passes_test(lambda u: u.is_superuser)
-# def all_trainings_list(request):
-#     trainings = Training.objects.all()
-#     context = {
-#         'trainings': trainings
-#     }
-#     return render(request, 'lms/includes/all_trainings_list.html', context=context)
+@user_passes_test(lambda u: u.is_superuser)
+def all_trainings_list(request):
+    trainings = Training.objects.all()
+    paginator = Paginator(trainings, 5)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainings': trainings,
+        'page_obj': page_obj,
+    }
+    return render(request, 'lms/includes/all_trainings_list.html', context=context)
 
 
-@method_decorator(staff_member_required, name='dispatch')
-class AllTrainingsList(ListView):
-    model = Training
-    template_name = 'lms/includes/all_trainings_list.html'
-    context_object_name = 'trainings'
-    paginate_by = 5
-    queryset = Training.objects.all()
+def htmx_paginate_all_trainings(request):
+    trainings = Training.objects.all()
+    paginator = Paginator(trainings, 5)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainings': trainings,
+        'page_obj': page_obj,
+    }
+    return render(request, 'lms/includes/all_trainings_loop.html', context)
+
+# @method_decorator(staff_member_required, name='dispatch')
+# class AllTrainingsList(ListView):
+#     model = Training
+#     template_name = 'lms/includes/all_trainings_list.html'
+#     context_object_name = 'trainings'
+#     paginate_by = 5
+#     queryset = Training.objects.all()
 
 
 def my_trainings(request):
@@ -89,13 +104,47 @@ def my_trainings(request):
 
 def my_trainings_list(request):
     trainings = request.user.training_set.all()
-    if request.user.is_staff:
-        return render(request, 'lms/includes/my_training_list_staff.html', {
-            'trainings': trainings,
-        })
-    return render(request, 'lms/includes/my_training_list_user.html', {
+    paginator = Paginator(trainings, 5)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
         'trainings': trainings,
-    })
+        'page_obj': page_obj
+    }
+    if request.htmx:
+        if request.user.is_staff:
+            return render(request, 'lms/includes/my_training_list_staff.html', context)
+        return render(request, 'lms/includes/my_training_list_user.html',context)
+    else:
+        if request.user.is_staff:
+            return render(request, 'lms/training_list_staff.html')
+        return render(request, 'lms/training_list_user.html')
+
+
+def htmx_paginate_my_trainings(request):
+    trainings = request.user.training_set.all()
+    paginator = Paginator(trainings, 5)  # Show 25 contacts per page.
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainings': trainings,
+        'page_obj': page_obj
+    }
+    if request.user.is_staff:
+        return render(request, 'lms/includes/my_trainings_staff_loop.html', context=context)
+    return render(request, 'lms/includes/my_trainings_user_loop.html', context=context)
+
+
+
+# def my_trainings_list(request):
+#     trainings = request.user.training_set.all()
+#     if request.user.is_staff:
+#         return render(request, 'lms/includes/my_training_list_staff.html', {
+#             'trainings': trainings,
+#         })
+#     return render(request, 'lms/includes/my_training_list_user.html', {
+#         'trainings': trainings,
+#     })
 
 
 def training_detail(request, pk):
@@ -207,7 +256,7 @@ def create_training(request):
             new_training.save()
             form.save_m2m()
             messages.success(request, 'Training Created')
-            return redirect('lms:my_trainings')
+            return redirect('lms:my_trainings_list')
     else:
         form = TrainingForm()
     return render(request, 'lms/create_training.html', {'form': form})
@@ -220,7 +269,7 @@ def update_training(request, pk):
         form = TrainingForm(request.POST, request.FILES, instance=training)
         if form.is_valid():
             form.save()
-            return redirect('lms:my_trainings')
+            return redirect('lms:my_trainings_list')
     else:
         form = TrainingForm(instance=training)
     return render(request, 'lms/update_training.html', {'form': form, 'training': training})
@@ -255,7 +304,7 @@ def create_enrollment(request, pk):
             enroll.created_by = request.user
             enroll.save()
             messages.add_message(request, messages.SUCCESS, 'SUCCESS')
-            return redirect('lms:my_trainings')
+            return redirect('lms:my_trainings_list')
     else:
         form = EnrollmentForm()
     return render(request, 'lms/enrollment_create_form.html', {
@@ -279,7 +328,7 @@ def bulk_add_attendee(request, pk):
                 else:
                     Enrollment.objects.create(training=training, user=u, permission=permission, created_by=request.user)
             # messages.add_message(request, messages.SUCCESS, 'SUCCESS')
-            return redirect('lms:my_trainings')
+            return redirect('lms:my_trainings_list')
     else:
         form = BulkAddAttendeeForm()
     return render(request, 'lms/bulk_attendee.html', {
