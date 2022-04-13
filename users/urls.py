@@ -37,4 +37,16 @@ urlpatterns = [
     path('create_user', views.create_user, name='create_user'),
     path('delete_user/<int:id>', views.delete_user, name='delete_user'),
 
+    path('all_moderators', views.all_moderators, name='all_moderators'),
+    path('htmx_paginate_all_mods', views.htmx_paginate_all_mods, name='htmx_paginate_all_mods'),
+
+    path('all_trainers', views.all_trainers, name='all_trainers'),
+    path('htmx_paginate_all_trainers', views.htmx_paginate_all_trainers, name='htmx_paginate_all_trainers'),
+
+    path('all_trainees', views.all_trainees, name='all_trainees'),
+    path('htmx_paginate_all_trainees', views.htmx_paginate_all_trainees, name='htmx_paginate_all_trainees'),
+
+    path('all_observers', views.all_observers, name='all_observers'),
+    path('htmx_paginate_all_observers', views.htmx_paginate_all_observers, name='htmx_paginate_all_observers'),
+
 ]

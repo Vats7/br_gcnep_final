@@ -20,7 +20,8 @@ from users.forms import LoginForm, SignUpForm, UserProfileForm, \
     UserChangeFormNew, UserCreationFormNew, ModProfileForm, DocumentForm
 from django.views.decorators.cache import cache_control
 from django.db.models.query_utils import Q
-from users.models import Document, UserProfile
+from users.models import Document, UserProfile, UserType
+
 User = get_user_model()
 
 #
@@ -462,3 +463,123 @@ def htmx_paginate_all_docs(request):
         'page_obj': page_obj
     }
     return render(request, 'users/includes/all_documents_loop.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def all_moderators(request):
+    mod = UserType.objects.get(type='MODERATOR')
+    moderators = User.objects.filter(types__in=[mod])
+    paginator = Paginator(moderators, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'moderators': moderators,
+        'page_obj': page_obj
+    }
+
+    if request.htmx:
+        return render(request, 'users/includes/all_moderators_list.html', context)
+    return render(request, 'users/all_moderators.html', context)
+
+
+def htmx_paginate_all_mods(request):
+    mod = UserType.objects.get(type='MODERATOR')
+    moderators = User.objects.filter(types__in=[mod])
+    paginator = Paginator(moderators, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'moderators': moderators,
+        'page_obj': page_obj
+    }
+    return render(request, 'users/includes/all_moderators_loop.html', context)
+
+
+@staff_member_required
+def all_trainers(request):
+    trainer = UserType.objects.get(type='TRAINER')
+    trainers = User.objects.filter(types__in=[trainer])
+    paginator = Paginator(trainers, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainers': trainers,
+        'page_obj': page_obj
+    }
+
+    if request.htmx:
+        return render(request, 'users/includes/all_trainers_list.html', context)
+    return render(request, 'users/all_trainers.html', context)
+
+
+def htmx_paginate_all_trainers(request):
+    trainer = UserType.objects.get(type='TRAINER')
+    trainers = User.objects.filter(types__in=[trainer])
+    paginator = Paginator(trainers, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainers': trainers,
+        'page_obj': page_obj
+    }
+    return render(request, 'users/includes/all_trainers_loop.html', context)
+
+
+@staff_member_required
+def all_trainees(request):
+    trainee = UserType.objects.get(type='TRAINEE')
+    trainees = User.objects.filter(types__in=[trainee])
+    paginator = Paginator(trainees, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainees': trainees,
+        'page_obj': page_obj
+    }
+
+    if request.htmx:
+        return render(request, 'users/includes/all_trainees_list.html', context)
+    return render(request, 'users/all_trainees.html', context)
+
+
+def htmx_paginate_all_trainees(request):
+    trainee = UserType.objects.get(type='TRAINEE')
+    trainees = User.objects.filter(types__in=[trainee])
+    paginator = Paginator(trainees, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'trainees': trainees,
+        'page_obj': page_obj
+    }
+    return render(request, 'users/includes/all_trainees_loop.html', context)
+
+
+@staff_member_required
+def all_observers(request):
+    observer = UserType.objects.get(type='OBSERVER')
+    observers = User.objects.filter(types__in=[observer])
+    paginator = Paginator(observers, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'observers': observers,
+        'page_obj': page_obj
+    }
+
+    if request.htmx:
+        return render(request, 'users/includes/all_observers_list.html', context)
+    return render(request, 'users/all_observers.html', context)
+
+
+def htmx_paginate_all_observers(request):
+    observer = UserType.objects.get(type='OBSERVER')
+    observers = User.objects.filter(types__in=[observer])
+    paginator = Paginator(observers, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'observers': observers,
+        'page_obj': page_obj
+    }
+    return render(request, 'users/includes/all_observers_loop.html', context)

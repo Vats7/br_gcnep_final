@@ -1,0 +1,44 @@
+{% if trainees %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card ">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table text-center mb-20">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>User Types</th>
+                                    <th>Active</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% include 'users/includes/all_trainees_loop.html' %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card ">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            No Trainees
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

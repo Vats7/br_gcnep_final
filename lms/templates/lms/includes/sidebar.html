@@ -95,6 +95,20 @@
                         <ul class="sub-menu" aria-expanded="false">
                             <li><a href="{% url 'users:all_users' %}">Access Users list </a></li>
                         </ul>
+                        {% if request.user.is_superuser %}
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{% url 'users:all_moderators' %}">Access Moderator</a></li>
+                            </ul>
+                        {% endif %}
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'users:all_trainers' %}">Access Trainers</a></li>
+                        </ul>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'users:all_trainees' %}">Access Trainees</a></li>
+                        </ul>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="{% url 'users:all_observers' %}">Access Observers</a></li>
+                        </ul>
                         <ul class="sub-menu" aria-expanded="false">
                             <li><a href="{% url 'users:create_user' %}">Create Account</a></li>
                         </ul>

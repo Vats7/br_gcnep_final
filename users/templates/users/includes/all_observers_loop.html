@@ -1,0 +1,34 @@
+{% for u in page_obj %}
+    <tr hx-target="this" hx-swap="outerHTML">
+        <td>
+            <a href="{% url 'users:update_user' u.id %}">
+                {{ u.name }}
+            </a>
+        </td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.types.all|join:", " }}</td>
+        <td>{{ u.is_active }}</td>
+        <td>
+            <a hx-delete="{% url 'users:delete_user' u.id %}" hx-confirm="Are You Sure..?" class="btn btn-danger btn-sm edit">
+                <i class="fas fa-trash"></i>
+            </a>
+            <a href="{% url 'users:user_profile_view' u.id %}" class="btn btn-info btn-sm edit">
+                <i class="fas fa-edit"></i>
+            </a>
+        </td>
+    </tr>
+
+{% endfor %}
+
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'users:htmx_paginate_all_observers' %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}
