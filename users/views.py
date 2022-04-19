@@ -20,7 +20,7 @@ from users.forms import LoginForm, SignUpForm, UserProfileForm, \
     UserChangeFormNew, UserCreationFormNew, ModProfileForm, DocumentForm
 from django.views.decorators.cache import cache_control
 from django.db.models.query_utils import Q
-from users.models import Document, UserProfile, UserType
+from users.models import Document, UserProfile, UserType, ModeratorProfile
 
 User = get_user_model()
 
@@ -133,9 +133,10 @@ def my_profile_view(request):
             return render(request, 'users/profile.html', {'profile_form': profile_form})
         else:
             profile = request.user.profile
-            profile_form = UserProfileForm(request.POST, instance=profile)
+            profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
             if profile_form.is_valid():
                 profile_form.save()
+                messages.success(request, 'updated profile')
                 return redirect('users:my_profile')
             return render(request, 'users/profile.html', {'profile_form': profile_form})
     else:
@@ -163,25 +164,29 @@ def my_profile_view(request):
 ########################################################################################################################
 ########################################################################################################################
 ##########################################################################################
-@method_decorator(staff_member_required, name='dispatch')
-class UserList(ListView):
-    model = User
-    template_name = 'users/all_users.html'
-    context_object_name = 'users'
-    paginate_by = 5
-    permission_classes = []
+# @method_decorator(staff_member_required, name='dispatch')
+# class UserList(ListView):
+#     model = User
+#     template_name = 'users/all_users.html'
+#     context_object_name = 'users'
+#     paginate_by = 5
+#     permission_classes = []
+#
+#     # def get_template_names(self):
+#     #     if self.request.htmx:
+#     #         return 'users/includes/user_list.html'
+#     #     return 'users/all_users.html'
+#
+#     def get_queryset(self):
+#         queryset = User.objects.all()
+#         if self.request.user.is_superuser:
+#             return queryset
+#         else:
+#             return queryset.filter(is_staff=False)
 
-    # def get_template_names(self):
-    #     if self.request.htmx:
-    #         return 'users/includes/user_list.html'
-    #     return 'users/all_users.html'
-
-    def get_queryset(self):
-        queryset = User.objects.all()
-        if self.request.user.is_superuser:
-            return queryset
-        else:
-            return queryset.filter(is_staff=False)
+@user_passes_test(lambda u: u.is_superuser)
+def all_users(request):
+    return render(request, 'users/all_users.html')
 
 
 @staff_member_required
@@ -286,6 +291,7 @@ def upload_documents(request):
         if doc_form.is_valid():
             print('yes')
             files = request.FILES.getlist('file')
+            print(len(files))
             print(files)
             for f in files:
                 Document.objects.create(
@@ -298,7 +304,7 @@ def upload_documents(request):
             return HttpResponse(status=204, headers={
                 'HX-Trigger': json.dumps({
                     "myDocListChanged": None,
-                    "showMessage": 'documents added'
+                    "showMessage": f"{len(files)} documents uploaded"
 
                 })
             })
@@ -323,6 +329,7 @@ def get_my_documents(request):
     if request.htmx:
         return render(request, 'users/includes/my_documents_list.html', context)
     return render(request, 'users/my_documents.html', context)
+
 
 
 @require_http_methods(['DELETE'])
@@ -369,7 +376,8 @@ def search_my_documents(request):
 @staff_member_required
 def staff_get_user_documents(request, id):
     user = User.objects.get(pk=id)
-    documents = user.profile.documents.all()
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    documents = profile.documents.all()
     paginator = Paginator(documents, 5)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
@@ -403,14 +411,14 @@ def user_profile_view(request, id):
     if request.method == 'POST':
         if user.is_mod:
             profile = user.mod_profile
-            form = ModProfileForm(request.POST, instance=profile)
+            form = ModProfileForm(request.POST, request.FILES, instance=profile)
             if form.is_valid():
                 form.save()
                 return redirect('users:all_users_list')
             return render(request, 'users/user_profile.html', {'form': form})
         else:
             profile = user.profile
-            form = UserProfileForm(request.POST, instance=profile)
+            form = UserProfileForm(request.POST, request.FILES, instance=profile)
             if form.is_valid():
                 form.save()
                 return redirect('users:all_users_list')

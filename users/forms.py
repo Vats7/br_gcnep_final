@@ -91,7 +91,7 @@ class LoginForm(forms.Form):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['first_name', 'last_name', 'gender', 'dob', 'pob', 'org_ins',
+        fields = ['image', 'first_name', 'last_name', 'gender', 'dob', 'pob', 'org_ins',
                   'ofc_add', 'ofc_number', 'nationality', 'fax', 'secondary_email']
         widgets = {
             'dob': forms.DateInput(attrs={
@@ -127,35 +127,43 @@ class SignUpForm(UserCreationForm):
         return u_types
 
 
-# class DocumentForm(forms.ModelForm):
-#     class Meta:
-#         model = Document
-#         fields = ['type', 'file']
-#         widgets = {
-#             'file': forms.ClearableFileInput(attrs={'multiple': True}),
-#             'type': forms.Select(attrs={'class': 'form-select', })
-#         }
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['type', 'file']
+        widgets = {
+            'file': forms.ClearableFileInput(attrs={'multiple': True}),
+            'type': forms.Select(attrs={'class': 'form-select', })
+        }
+
+    # def clean_file(self):
+    #     files = self.cleaned_data['file']
+    #     print(len(files))
+    #     if len(files) > 4:
+    #         raise ValidationError('More than 4 files not allowed')
+    #     return files
 
 
-class DocumentForm(forms.Form):
-    Types = [
-        ('SIGNATURE', 'Signature'),
-        ('PASSPORT', 'Passport'),
-        ('VISA', 'Visa'),
-        ('APPROVAL', 'Approval'),
-        ('AV', 'AudioVideo'),
-    ]
-
-    type = forms.ChoiceField(choices=Types, widget=forms.Select(attrs={'class': 'form-select', }))
-    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
-    #file = forms.FileField()
+# class DocumentForm(forms.Form):
+#     Types = [
+#         ('SIGNATURE', 'Signature'),
+#         ('PASSPORT', 'Passport'),
+#         ('VISA', 'Visa'),
+#         ('APPROVAL', 'Approval'),
+#         #('AV', 'AudioVideo'),
+#     ]
+#
+#     type = forms.ChoiceField(choices=Types, widget=forms.Select(attrs={'class': 'form-select', }))
+#     file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
     
     # def clean_file(self):
-    #     files = self.request.FILES.getlist('file')
+    #     files = self.cleaned_data.get('file')
     #     print(len(files))
     #     if len(files) > 3:
-    #         raise ValidationError('More than 3')
+    #         raise ValidationError('More than 3 files not allowed')
     #     return files
+
+
 
 
 class BulkAddUserForm(forms.Form):

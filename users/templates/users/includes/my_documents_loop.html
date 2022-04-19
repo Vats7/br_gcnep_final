@@ -12,15 +12,15 @@
 {% endfor %}
 
 
-{#{% if page_obj.has_next %}#}
-{#    <tr id="load-more">#}
-{#        <td colspan="4" class="text-center">#}
-{#            <button class="btn btn-primary"#}
-{#                    hx-get="{% url 'users:htmx_paginate_my_docs' %}?page={{ page_obj.next_page_number }}"#}
-{#                    hx-target="#load-more"#}
-{#                    hx-swap="outerHTML"#}
-{#            >#}
-{#                Load More</button>#}
-{#        </td>#}
-{#    </tr>#}
-{#{% endif %}#}
+{% if page_obj.has_next %}
+    <tr id="load-more">
+        <td colspan="4" class="text-center">
+            <button class="btn btn-primary"
+                    hx-get="{% url 'users:htmx_paginate_my_docs' %}?page={{ page_obj.next_page_number }}"
+                    hx-target="#load-more"
+                    hx-swap="outerHTML"
+            >
+                Load More</button>
+        </td>
+    </tr>
+{% endif %}

@@ -28,20 +28,26 @@
                             </div>
                         </div>
                     </div>
+                    {% if request.user.profile.image %}
+                        <div class="col mb-2">
+                            <img src="{{ request.user.profile.image.url }}" width="100" height="100">
+                        </div>
+                    {% endif %}
                     {% if not request.user.is_staff %}
                         <div class="col mb-3">
                             <button class="btn btn-primary">Add Employment</button>
                             <button class="btn btn-primary">Add Education</button>
-                            <a href="{% url 'users:get_my_documents' %}">
-                                <button class="btn btn-primary">My Documents</button>
-                            </a>
+                            <button class="btn btn-primary" hx-get="{% url 'users:get_my_documents' %}">My Documents</button>
+{#                            <a href="{% url 'users:my_documents' %}">#}
+{#                                <button class="btn btn-primary">My Documents</button>#}
+{#                            </a>#}
                         </div>
                     {% endif %}
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <form id="profile-form" method="POST">
+                                    <form id="profile-form" method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         {{ profile_form|crispy }}
                                         <button type="submit" class="btn btn-primary mt-3">Update</button>

@@ -9,19 +9,11 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from home.models import BaseModel, School, Department
+from users.validators import validate_file_size #validate_is_jpg_or_png
 
 
 def user_directory_path(instance, filename):
     return 'users/user_{0}/{1}'.format(instance.user.id, filename)
-
-
-def validate_file_size(value):
-    filesize = value.size
-
-    if filesize > 5242880:
-        raise ValidationError("The maximum file size that can be uploaded is 5MB")
-    else:
-        return value
 
 
 class UserType(models.Model):
@@ -153,7 +145,7 @@ class UserProfile(models.Model):
     image = models.ImageField(
         upload_to=user_directory_path,
         verbose_name='Image',
-        help_text='Upload an Image(Flyer). Should be less than 5MB',
+        help_text='Upload an Image. Should be less than 5MB',
         validators=[validate_file_size, ],
         blank=True,
     )
@@ -233,7 +225,7 @@ class Document(BaseModel):
         PASSPORT = 'PASSPORT', _('Passport')
         VISA = 'VISA', _('Visa')
         APPROVAL = 'APPROVAL', _('Approval')
-        AV = 'AV', _('AudioVideo')
+        #AV = 'AV', _('AudioVideo')
 
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='documents')
     type = models.CharField(
@@ -243,8 +235,9 @@ class Document(BaseModel):
     file = models.FileField(
         upload_to=user_directory_path,
         verbose_name='Upload File',
-        help_text='Multiple Upload Allowed',
-        validators=[validate_file_size, ],
+        validators=[validate_file_size, ]
+        #help_text='Upload upto 4 images (.jpg or .png)',
+        # validators=[validate_file_size, FileExtensionValidator(allowed_extensions=['jpg', 'png'])],
     )
 
     def __str__(self):

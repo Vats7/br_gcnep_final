@@ -122,7 +122,6 @@ def upload_questions(request):
         form = ExcelForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES.get('file')
-            # file = request.FILES['file']
             csv_data = pd.read_csv(file)
             print(csv_data.head())
             row_iter = csv_data.iterrows()

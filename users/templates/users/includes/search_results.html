@@ -28,7 +28,11 @@
                                         <td>{{ u.email }}</td>
                                         <td>{{ u.types.all|join:", " }}</td>
                                         {% if not u.is_staff %}
-                                            <td>Normal User</td>
+                                            <td>
+                                                <a href="{% url 'users:staff_get_user_documents' u.id %}">
+                                                    View
+                                                </a>
+                                            </td>
                                         {% else %}
                                             <td>Staff</td>
                                         {% endif %}
